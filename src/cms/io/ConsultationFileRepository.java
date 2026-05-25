@@ -8,6 +8,6 @@ package cms.io;
  *
  * @author hp
  */
-public class ConsultationFileRespository {
-    
+public class ConsultationFileRepository {
+    //for reading and writing consultation records
 }

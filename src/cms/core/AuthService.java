@@ -4,10 +4,27 @@
  */
 package cms.core;
 
-/**
- *
- * @author hp
- */
+import cms.io.UserFileRepository;
+import java.util.List;
+
 public class AuthService {
-    
+
+    private UserFileRepository userRepo;
+
+    public AuthService() {
+        userRepo = new UserFileRepository();
+    }
+
+    public User login(String username, String password) {
+        List<User> users = userRepo.getAllUsers();
+
+        for (User user : users) {
+            if (user.getUsername().equals(username)
+                    && user.getPassword().equals(password)) {
+                return user;
+            }
+        }
+
+        return null;
+    }
 }

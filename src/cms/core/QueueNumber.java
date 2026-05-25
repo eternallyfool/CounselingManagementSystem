@@ -4,10 +4,6 @@
  */
 package cms.core;
 
-/**
- *
- * @author hp
- */
 public class QueueNumber {
-    
+//for queue number generation
 }

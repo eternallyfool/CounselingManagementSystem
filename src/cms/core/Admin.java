@@ -4,10 +4,14 @@
  */
 package cms.core;
 
-/**
- *
- * @author hp
- */
-public class Admin {
-    
+public class Admin extends User {
+
+    public Admin(String userId, String username, String password, String fullName) {
+        super(userId, username, password, "Admin", fullName);
+    }
+
+    @Override
+    public String getDashboardTitle() {
+        return "Admin Dashboard";
+    }
 }

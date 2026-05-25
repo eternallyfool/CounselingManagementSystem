@@ -4,10 +4,14 @@
  */
 package cms.core;
 
-/**
- *
- * @author hp
- */
-public class Student {
-    
+public class Student extends User {
+
+    public Student(String userId, String username, String password, String fullName) {
+        super(userId, username, password, "Student", fullName);
+    }
+
+    @Override
+    public String getDashboardTitle() {
+        return "Student Dashboard";
+    }
 }

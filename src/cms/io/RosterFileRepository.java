@@ -8,6 +8,7 @@ package cms.io;
  *
  * @author hp
  */
-public class UserFileRespository {
+public class RosterFileRepository {
+    //for reading and writig roster records
     
 }

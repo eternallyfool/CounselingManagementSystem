@@ -4,10 +4,16 @@
  */
 package cms.util;
 
-/**
- *
- * @author hp
- */
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class DateUtil {
-    
+
+    public static LocalDate parseDate(String date) {
+        return LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    public static String today() {
+        return LocalDate.now().toString();
+    }
 }

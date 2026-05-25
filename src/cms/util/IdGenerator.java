@@ -4,10 +4,9 @@
  */
 package cms.util;
 
-/**
- *
- * @author hp
- */
 public class IdGenerator {
-    
+
+    public static String generateNextId(String prefix, int number) {
+        return prefix + String.format("%03d", number);
+    }
 }

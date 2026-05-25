@@ -4,10 +4,7 @@
  */
 package cms.core;
 
-/**
- *
- * @author hp
- */
 public class Appointment {
+// for appointment related data and methods
     
 }

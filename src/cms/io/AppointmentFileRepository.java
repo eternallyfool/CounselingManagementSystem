@@ -8,6 +8,6 @@ package cms.io;
  *
  * @author hp
  */
-public class RosterFileRespository {
-    
+public class AppointmentFileRepository {
+    //for reading and writing appointment records
 }

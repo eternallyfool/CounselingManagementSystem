@@ -4,10 +4,17 @@
  */
 package cms.util;
 
-/**
- *
- * @author hp
- */
 public class ValidationUtil {
-    
+
+    public static boolean isEmpty(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    public static boolean isValidPhone(String phone) {
+        return phone.matches("\\d{10,12}");
+    }
+
+    public static boolean isValidEmail(String email) {
+        return email.contains("@") && email.contains(".");
+    }
 }

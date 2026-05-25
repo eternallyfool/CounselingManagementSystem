@@ -4,10 +4,14 @@
  */
 package cms.core;
 
-/**
- *
- * @author hp
- */
-public class Receptionist {
-    
+public class Receptionist extends User {
+
+    public Receptionist(String userId, String username, String password, String fullName) {
+        super(userId, username, password, "Receptionist", fullName);
+    }
+
+    @Override
+    public String getDashboardTitle() {
+        return "Receptionist Dashboard";
+    }
 }

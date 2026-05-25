@@ -4,10 +4,6 @@
  */
 package cms.core;
 
-/**
- *
- * @author hp
- */
 public class Roster {
-    
+// for staff roster and schedule data
 }
