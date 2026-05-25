@@ -1,4 +1,4 @@
-U001|admin01|12345|Admin|Admin User
-U002|counselor01|12345|Counselor|Dr Tan
-U003|reception01|12345|Receptionist|Reception User
-U004|student01|12345|Student|Student User
+U1|admin|12345|Admin|Jordan
+U2|counselor|12345|Counselor|Bryan
+U3|receptionist|12345|Receptionist|KahFatt
+U4|student|12345|Student|Aaditya
