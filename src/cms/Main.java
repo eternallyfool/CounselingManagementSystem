@@ -7,6 +7,9 @@ package cms;
 import cms.ui.LoginFrame;
 import javax.swing.SwingUtilities;
 
+// Test change: verifying Git push works
+
+
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
