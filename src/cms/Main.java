@@ -5,15 +5,29 @@
 package cms;
 
 import cms.ui.LoginFrame;
+import javax.swing.UIManager;
 import javax.swing.SwingUtilities;
 
-// Test change: verifying Git push works
-
-
 public class Main {
+
     public static void main(String[] args) {
+        setApplicationLookAndFeel();
+
         SwingUtilities.invokeLater(() -> {
             new LoginFrame().setVisible(true);
         });
+    }
+
+    private static void setApplicationLookAndFeel() {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    return;
+                }
+            }
+        } catch (Exception e) {
+
+        }
     }
 }
