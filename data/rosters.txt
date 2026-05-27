@@ -1,0 +1,3 @@
+R1|U2|2026-06-01|09:00|12:00|Individual Therapy Room 1|Available
+R2|U2|2026-06-01|14:00|17:00|Individual Therapy Room 2|Available
+R3|U2|2026-06-02|09:00|12:00|Group Therapy Room|Available

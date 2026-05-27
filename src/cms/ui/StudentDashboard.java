@@ -27,6 +27,7 @@ public class StudentDashboard extends JFrame {
         JButton btnBook = new JButton("Book / Reschedule / Cancel Appointment");
         JButton btnHistory = new JButton("View Appointment History");
         JButton btnProfiles = new JButton("View Counselor Profiles");
+        //create new fetaures with JButton like example below (logout is one of the function)
         JButton btnLogout = new JButton("Logout");
 
         JPanel panel = new JPanel(new GridLayout(5, 1, 10, 10));
@@ -34,6 +35,7 @@ public class StudentDashboard extends JFrame {
         panel.add(btnBook);
         panel.add(btnHistory);
         panel.add(btnProfiles);
+        //create panel for the new features like example below
         panel.add(btnLogout);
 
         add(lblWelcome, BorderLayout.NORTH);
