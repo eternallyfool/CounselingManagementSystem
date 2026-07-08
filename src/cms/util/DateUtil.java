@@ -5,15 +5,31 @@
 package cms.util;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class DateUtil {
 
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
     public static LocalDate parseDate(String date) {
-        return LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        return LocalDate.parse(date, DATE_FORMAT);
     }
 
     public static String today() {
         return LocalDate.now().toString();
+    }
+
+    public static String now() {
+        return LocalDateTime.now().format(DATE_TIME_FORMAT);
+    }
+
+    public static boolean isDateInRange(String date, String startDate, String endDate) {
+        LocalDate value = parseDate(date);
+        LocalDate start = parseDate(startDate);
+        LocalDate end = parseDate(endDate);
+
+        return !value.isBefore(start) && !value.isAfter(end);
     }
 }
