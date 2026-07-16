@@ -24,7 +24,7 @@ public class IdGenerator {
                         highest = number;
                     }
                 } catch (NumberFormatException e) {
-                    // just ignore IDs that dont follow the prefix number pattern.
+                    // Ignore IDs that do not follow the expected prefix-number pattern.
                 }
             }
         }
