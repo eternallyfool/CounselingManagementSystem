@@ -10,8 +10,17 @@ public class Student extends User {
         super(userId, username, password, "Student", fullName);
     }
 
+    public Student(String userId, String username, String password, String fullName, String status) {
+        super(userId, username, password, "Student", fullName, status);
+    }
+
     @Override
     public String getDashboardTitle() {
         return "Student Dashboard";
     }
+
+    public boolean canBookAppointment() {
+        return true;
+    }
 }
+
