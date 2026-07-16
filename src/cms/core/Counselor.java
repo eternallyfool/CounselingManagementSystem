@@ -10,18 +10,8 @@ public class Counselor extends User {
         super(userId, username, password, "Counselor", fullName);
     }
 
-    public Counselor(String userId, String username, String password, String fullName, String status) {
-        super(userId, username, password, "Counselor", fullName, status);
-    }
-
     @Override
     public String getDashboardTitle() {
         return "Counselor Dashboard";
     }
-
-    public boolean canAddConsultationNotes() {
-        return true;
-    }
 }
-
-

@@ -5,7 +5,6 @@
 package cms.core;
 
 import cms.io.UserFileRepository;
-import cms.util.ValidationUtil;
 import java.util.List;
 
 public class AuthService {
@@ -17,16 +16,11 @@ public class AuthService {
     }
 
     public User login(String username, String password) {
-        if (ValidationUtil.isEmpty(username) || ValidationUtil.isEmpty(password)) {
-            return null;
-        }
-
         List<User> users = userRepo.getAllUsers();
 
         for (User user : users) {
-            if (user.getUsername().equals(username.trim())
-                    && user.checkPassword(password)
-                    && user.isActive()) {
+            if (user.getUsername().equals(username)
+                    && user.getPassword().equals(password)) {
                 return user;
             }
         }
