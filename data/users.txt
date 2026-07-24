@@ -1,4 +1,5 @@
-U1|jordan|12345|Admin|JordanLim|Active
+U1|kahfatt|12345|Admin|LaiKahFatt|Active
 U2|aaditya|12345|Counselor|AadityaPrasanthVasudevan|Active
-U3|kahfatt|12345|Receptionist|LaiKahFatt|Active
-U4|bryan|12345|Student|BryanLeanCheeKit|Active
+U3|bryan|12345|Receptionist|BryanLeanCheeKit|Active
+U4|jordan|12345|Student|JordanLim|Active
+

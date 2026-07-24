@@ -10,8 +10,16 @@ public class Admin extends User {
         super(userId, username, password, "Admin", fullName);
     }
 
+    public Admin(String userId, String username, String password, String fullName, String status) {
+        super(userId, username, password, "Admin", fullName, status);
+    }
+
     @Override
     public String getDashboardTitle() {
         return "Admin Dashboard";
+    }
+
+    public boolean canGenerateReports() {
+        return true;
     }
 }

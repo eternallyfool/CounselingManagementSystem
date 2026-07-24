@@ -72,7 +72,7 @@ public class QueueNumberFileRepository {
                     highest = number;
                 }
             } catch (NumberFormatException e) {
-                // Ignore malformed queue numbers.
+                // to ignore malformed queue numbers.
             }
         }
 

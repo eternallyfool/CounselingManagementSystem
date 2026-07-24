@@ -1,3 +1,4 @@
 A1|U4|U2|Online|2026-06-01|10:00|10:30|Academic stress|Booked|U4|2026-05-27 10:00
 A2|U4|U2|WalkIn|2026-06-01|14:00|14:30|Personal consultation|Completed|U3|2026-05-27 10:30
-A3|U4|U2|Online|2026-06-03|11:00|11:30|Follow-up discussion|Cancelled|U4|2026-05-27 11:00
+A3|U4|U2|Online|2026-06-13|11:00|11:30|Need help with stress management|Cancelled|U4|2026-07-23 17:37
+A4|U4|U2|Online|2026-06-14|13:00|15:00|Feel melancholic|Cancelled|U4|2026-07-23 17:44
