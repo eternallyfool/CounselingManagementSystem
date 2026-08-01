@@ -117,4 +117,24 @@ public class UserFileRepository {
 
         return IdGenerator.generateNextId("U", ids);
     }
+    public boolean deleteUser(String userId) {
+    List<User> users = getAllUsers();
+    List<String> lines = new ArrayList<>();
+    boolean deleted = false;
+
+    for (User user : users) {
+        if (user.getUserId().equals(userId)) {
+            deleted = true; // skip this user (effectively deleting)
+        } else {
+            lines.add(user.toDataString());
+        }
+    }
+
+    if (deleted) {
+        FileManager.writeLines(filePath, lines);
+    }
+
+    return deleted;
+}
+
 }
