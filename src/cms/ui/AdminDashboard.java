@@ -272,6 +272,8 @@ public class AdminDashboard extends javax.swing.JFrame {
         UIUtils.styleActionButton(btnToggleStatus, UIUtils.VINTAGE_CREAM);
         UIUtils.styleActionButton(btnAddRoster, UIUtils.VINTAGE_GOLD);
         UIUtils.styleActionButton(btnGenerateReport, UIUtils.VINTAGE_GOLD);
+        UIUtils.styleActionButton(btnDeleteUser, UIUtils.VINTAGE_GOLD);
+
         
         styleTable(tblUsers);
         styleTable(tblRosters);
@@ -308,6 +310,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         btnAddUser = new javax.swing.JButton();
         btnToggleStatus = new javax.swing.JButton();
+        btnDeleteUser = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblUsers = new javax.swing.JTable();
         panelRosters = new javax.swing.JPanel();
@@ -409,7 +412,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         );
         card1Layout.setVerticalGroup(
             card1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 364, Short.MAX_VALUE)
+            .addGap(0, 410, Short.MAX_VALUE)
         );
 
         panelDashboard.add(card1);
@@ -422,7 +425,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         );
         card2Layout.setVerticalGroup(
             card2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 364, Short.MAX_VALUE)
+            .addGap(0, 410, Short.MAX_VALUE)
         );
 
         panelDashboard.add(card2);
@@ -435,7 +438,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         );
         card3Layout.setVerticalGroup(
             card3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 364, Short.MAX_VALUE)
+            .addGap(0, 410, Short.MAX_VALUE)
         );
 
         panelDashboard.add(card3);
@@ -448,7 +451,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         );
         card4Layout.setVerticalGroup(
             card4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 364, Short.MAX_VALUE)
+            .addGap(0, 410, Short.MAX_VALUE)
         );
 
         panelDashboard.add(card4);
@@ -461,16 +464,21 @@ public class AdminDashboard extends javax.swing.JFrame {
         btnToggleStatus.setText("Toggle Status");
         btnToggleStatus.addActionListener(this::btnToggleStatusActionPerformed);
 
+        btnDeleteUser.setText("Delete User");
+        btnDeleteUser.addActionListener(this::btnDeleteUserActionPerformed);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(48, 48, 48)
+                .addContainerGap()
                 .addComponent(btnAddUser)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 74, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
+                .addComponent(btnDeleteUser)
+                .addGap(33, 33, 33)
                 .addComponent(btnToggleStatus)
-                .addGap(58, 58, 58))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -478,8 +486,9 @@ public class AdminDashboard extends javax.swing.JFrame {
                 .addGap(23, 23, 23)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddUser)
-                    .addComponent(btnToggleStatus))
-                .addContainerGap(19, Short.MAX_VALUE))
+                    .addComponent(btnToggleStatus)
+                    .addComponent(btnDeleteUser))
+                .addContainerGap(65, Short.MAX_VALUE))
         );
 
         jScrollPane1.setPreferredSize(new java.awt.Dimension(50, 50));
@@ -504,7 +513,7 @@ public class AdminDashboard extends javax.swing.JFrame {
             .addGroup(panelUsersLayout.createSequentialGroup()
                 .addGap(93, 93, 93)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(144, Short.MAX_VALUE))
+                .addContainerGap(145, Short.MAX_VALUE))
             .addGroup(panelUsersLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -575,7 +584,7 @@ public class AdminDashboard extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -634,7 +643,7 @@ public class AdminDashboard extends javax.swing.JFrame {
             .addGroup(panelReportsLayout.createSequentialGroup()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -878,6 +887,33 @@ public class AdminDashboard extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btnGenerateReportActionPerformed
+
+    private void btnDeleteUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteUserActionPerformed
+    int selectedRow = tblUsers.getSelectedRow();
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Please select a user to delete.");
+        return;
+    }
+
+    String userId = tblUsers.getValueAt(selectedRow, 0).toString();
+
+    int confirm = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to delete User ID: " + userId + "?",
+        "Confirm Deletion",
+        JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirm == JOptionPane.YES_OPTION) {
+        try {
+            userService.deleteUser(userId);
+            loadUsersTable(); // refresh table
+            JOptionPane.showMessageDialog(this, "User deleted successfully.");
+        } catch (DataNotFoundException ex) {
+            JOptionPane.showMessageDialog(this, "User not found.");
+        }
+    }
+    }//GEN-LAST:event_btnDeleteUserActionPerformed
     
     
     /**
@@ -909,6 +945,7 @@ public class AdminDashboard extends javax.swing.JFrame {
     private javax.swing.JButton btnAddRoster;
     private javax.swing.JButton btnAddUser;
     private javax.swing.JButton btnDashboard;
+    private javax.swing.JButton btnDeleteUser;
     private javax.swing.JButton btnGenerateReport;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnReports;
