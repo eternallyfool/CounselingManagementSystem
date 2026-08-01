@@ -107,4 +107,16 @@ public class UserService {
                 throw new IllegalArgumentException("Unsupported role: " + role);
         }
     }
+    public void deleteUser(String userId) throws DataNotFoundException {
+    User user = userRepository.findById(userId);
+    if (user == null) {
+        throw new DataNotFoundException("User was not found.");
+    }
+
+    boolean deleted = userRepository.deleteUser(userId);
+    if (!deleted) {
+        throw new DataNotFoundException("Failed to delete user.");
+    }
+}
+
 }
