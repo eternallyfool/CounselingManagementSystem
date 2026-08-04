@@ -11,6 +11,7 @@ import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 public class UIUtils {
 
@@ -126,6 +127,74 @@ public class UIUtils {
         field.setSelectionColor(VINTAGE_GOLD);
         field.setSelectedTextColor(VINTAGE_PANEL);
         field.setOpaque(true);
+    }
+    
+
+    public static class AvatarLabel extends JLabel {
+        private Image image;
+        private String initials;
+
+        public AvatarLabel(String userId, String fullName, int size) {
+            setPreferredSize(new Dimension(size, size));
+            setMinimumSize(new Dimension(size, size));
+            setMaximumSize(new Dimension(size, size));
+            
+            initials = "";
+            String[] parts = fullName.split(" ");
+            if (parts.length > 0 && !parts[0].isEmpty()) initials += parts[0].charAt(0);
+            if (parts.length > 1 && !parts[parts.length - 1].isEmpty()) initials += parts[parts.length - 1].charAt(0);
+            
+            try {
+                java.io.File imgFilePng = new java.io.File("data/images/" + userId + ".png");
+                java.io.File imgFileJpg = new java.io.File("data/images/" + userId + ".jpg");
+                
+                if (imgFilePng.exists()) {
+                    image = new ImageIcon(imgFilePng.getPath()).getImage();
+                } else if (imgFileJpg.exists()) {
+                    image = new ImageIcon(imgFileJpg.getPath()).getImage();
+                } else {
+                    System.out.println("DEBUG: Image not found at " + imgFilePng.getAbsolutePath());
+                }
+            } catch (Exception e) {
+                image = null;
+            }
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            int diameter = Math.min(getWidth(), getHeight()) - 2; 
+            int x = 1; 
+            int y = 1;
+
+            if (image != null) {
+                g2.setClip(new java.awt.geom.Ellipse2D.Double(x, y, diameter, diameter));
+                g2.drawImage(image, x, y, diameter, diameter, this);
+                
+                g2.setClip(null); 
+                g2.setColor(VINTAGE_GOLD);
+                g2.setStroke(new BasicStroke(2));
+                g2.drawOval(x, y, diameter, diameter);
+            } else {
+
+                g2.setColor(VINTAGE_SHADOW);
+                g2.fillOval(x, y, diameter, diameter);
+                
+                g2.setColor(VINTAGE_GOLD);
+                g2.setStroke(new BasicStroke(2));
+                g2.drawOval(x, y, diameter, diameter);
+                
+                g2.setColor(VINTAGE_GOLD);
+                g2.setFont(new Font("Georgia", Font.BOLD, diameter / 2));
+                FontMetrics fm = g2.getFontMetrics();
+                int textX = x + (diameter - fm.stringWidth(initials)) / 2;
+                int textY = y + ((diameter - fm.getHeight()) / 2) + fm.getAscent();
+                g2.drawString(initials, textX, textY);
+            }
+            g2.dispose();
+        }
     }
 }
     

@@ -64,6 +64,53 @@ public class AdminDashboard extends javax.swing.JFrame {
         table.getTableHeader().setForeground(UIUtils.VINTAGE_GOLD); 
         table.getTableHeader().setBorder(null);
     }
+    
+    private void styleTableInteraction(JTable table) {
+        table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+                if (row > -1 && col > -1) {
+                    Object value = table.getValueAt(row, col);
+                    if (value != null && value.toString().length() > 20) {
+                        table.setToolTipText(value.toString());
+                    } else {
+                        table.setToolTipText(null);
+                    }
+                }
+            }
+        });
+        
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2) { 
+                    int row = table.getSelectedRow();
+                    int col = table.getSelectedColumn();
+                    if (row > -1 && col > -1) {
+                        Object value = table.getValueAt(row, col);
+                        if (value != null) {
+                            JTextArea textArea = new JTextArea(value.toString());
+                            textArea.setEditable(false);
+                            textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+                            textArea.setBackground(UIUtils.VINTAGE_SHADOW);
+                            textArea.setForeground(UIUtils.VINTAGE_CREAM);
+                            textArea.setLineWrap(true);
+                            textArea.setWrapStyleWord(true);
+                            textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                            
+                            JScrollPane scrollPane = new JScrollPane(textArea);
+                            scrollPane.setPreferredSize(new Dimension(400, 200));
+                            
+                            String colName = table.getColumnName(col);
+                            JOptionPane.showMessageDialog(AdminDashboard.this, scrollPane, colName + " Details", JOptionPane.PLAIN_MESSAGE);
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     private void loadDashboardStats() {
         List<User> users = userService.getAllUsers();
@@ -103,6 +150,20 @@ public class AdminDashboard extends javax.swing.JFrame {
             model.addRow(new Object[]{ user.getUserId(), user.getUsername(), user.getRole(), user.getFullName(), user.getStatus() });
         }
         tblUsers.setModel(model);
+        
+        tblUsers.getColumnModel().getColumn(0).setMinWidth(80); 
+        tblUsers.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblUsers.getColumnModel().getColumn(1).setMinWidth(120); 
+        tblUsers.getColumnModel().getColumn(1).setPreferredWidth(120);
+        tblUsers.getColumnModel().getColumn(2).setMinWidth(100); 
+        tblUsers.getColumnModel().getColumn(2).setPreferredWidth(100);
+        tblUsers.getColumnModel().getColumn(3).setMinWidth(200);
+        tblUsers.getColumnModel().getColumn(3).setPreferredWidth(250);
+        tblUsers.getColumnModel().getColumn(4).setMinWidth(100);
+        tblUsers.getColumnModel().getColumn(4).setPreferredWidth(100);
+        tblUsers.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        styleTableInteraction(tblUsers);
     }
 
     private void loadRostersTable() {
@@ -115,6 +176,24 @@ public class AdminDashboard extends javax.swing.JFrame {
             model.addRow(new Object[]{ r.getRosterId(), r.getCounselorId(), r.getWorkDate(), r.getStartTime(), r.getEndTime(), r.getRoom(), r.getAvailabilityStatus() });
         }
         tblRosters.setModel(model);
+        
+        tblRosters.getColumnModel().getColumn(0).setMinWidth(80); 
+        tblRosters.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblRosters.getColumnModel().getColumn(1).setMinWidth(110); 
+        tblRosters.getColumnModel().getColumn(1).setPreferredWidth(110);
+        tblRosters.getColumnModel().getColumn(2).setMinWidth(100);
+        tblRosters.getColumnModel().getColumn(2).setPreferredWidth(100);
+        tblRosters.getColumnModel().getColumn(3).setMinWidth(80); 
+        tblRosters.getColumnModel().getColumn(3).setPreferredWidth(80);
+        tblRosters.getColumnModel().getColumn(4).setMinWidth(80); 
+        tblRosters.getColumnModel().getColumn(4).setPreferredWidth(80);
+        tblRosters.getColumnModel().getColumn(5).setMinWidth(150);
+        tblRosters.getColumnModel().getColumn(5).setPreferredWidth(200);
+        tblRosters.getColumnModel().getColumn(6).setMinWidth(100);
+        tblRosters.getColumnModel().getColumn(6).setPreferredWidth(100);
+        tblRosters.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        styleTableInteraction(tblRosters);
     }
 
     private void loadReportsTable() {
@@ -127,6 +206,24 @@ public class AdminDashboard extends javax.swing.JFrame {
             model.addRow(new Object[]{ r.getReportId(), r.getReportType(), r.getPeriodStart(), r.getPeriodEnd(), r.getTotalAppointments(), r.getCompleted(), r.getCancelled() });
         }
         tblReports.setModel(model);
+        
+        tblReports.getColumnModel().getColumn(0).setMinWidth(80);
+        tblReports.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblReports.getColumnModel().getColumn(1).setMinWidth(80); 
+        tblReports.getColumnModel().getColumn(1).setPreferredWidth(80);
+        tblReports.getColumnModel().getColumn(2).setMinWidth(100); 
+        tblReports.getColumnModel().getColumn(2).setPreferredWidth(100);
+        tblReports.getColumnModel().getColumn(3).setMinWidth(100); 
+        tblReports.getColumnModel().getColumn(3).setPreferredWidth(100);
+        tblReports.getColumnModel().getColumn(4).setMinWidth(100);
+        tblReports.getColumnModel().getColumn(4).setPreferredWidth(100);
+        tblReports.getColumnModel().getColumn(5).setMinWidth(100);
+        tblReports.getColumnModel().getColumn(5).setPreferredWidth(100);
+        tblReports.getColumnModel().getColumn(6).setMinWidth(100);
+        tblReports.getColumnModel().getColumn(6).setPreferredWidth(100);
+        tblReports.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        styleTableInteraction(tblReports);
     }
 
     private void setActiveButton(JButton activeBtn) {
@@ -148,10 +245,10 @@ public class AdminDashboard extends javax.swing.JFrame {
         panelUsers.setBackground(UIUtils.VINTAGE_BG);
         panelRosters.setBackground(UIUtils.VINTAGE_BG);
         panelReports.setBackground(UIUtils.VINTAGE_BG);
-        card1.setBackground(UIUtils.VINTAGE_PANEL); 
-        card2.setBackground(UIUtils.VINTAGE_PANEL);
-        card3.setBackground(UIUtils.VINTAGE_PANEL); 
-        card4.setBackground(UIUtils.VINTAGE_PANEL);
+        card1.setBackground(UIUtils.VINTAGE_ROSE); 
+        card2.setBackground(UIUtils.VINTAGE_ROSE);
+        card3.setBackground(UIUtils.VINTAGE_ROSE); 
+        card4.setBackground(UIUtils.VINTAGE_ROSE);
         lblHeaderTitle.setForeground(UIUtils.VINTAGE_GOLD);
         lblAdminName.setForeground(UIUtils.VINTAGE_CREAM.darker());
         SwingUtilities.updateComponentTreeUI(this);
@@ -210,21 +307,21 @@ public class AdminDashboard extends javax.swing.JFrame {
         setupContent();
     }
 
-    private void setupSidebar() {
+        private void setupSidebar() {
         sidebarPanel.setPreferredSize(new Dimension(250, getHeight()));
         sidebarPanel.setLayout(new BoxLayout(sidebarPanel, BoxLayout.Y_AXIS));
-        sidebarPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
-        sidebarPanel.setBackground(UIUtils.VINTAGE_ROSE);
+        sidebarPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
+        sidebarPanel.setBackground(UIUtils.VINTAGE_PANEL);
         sidebarPanel.removeAll();
 
-        JLabel lblLogo = new JLabel("CMS");
-        lblLogo.setFont(new Font("Georgia", Font.BOLD, 40));
-        lblLogo.setForeground(UIUtils.VINTAGE_GOLD);
-        lblLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblLogo.setBorder(new EmptyBorder(0, 0, 30, 0));
-        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-        lblLogo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
-        sidebarPanel.add(lblLogo);
+        JPanel avatarWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        avatarWrapper.setOpaque(false);
+        avatarWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+
+        UIUtils.AvatarLabel avatar = new UIUtils.AvatarLabel(loggedInAdmin.getUserId(), loggedInAdmin.getFullName(), 100);
+        avatarWrapper.add(avatar);
+        avatarWrapper.setBorder(new EmptyBorder(10, 0, 20, 0));
+        sidebarPanel.add(avatarWrapper);
 
         UIUtils.styleMenuButton(btnDashboard);
         UIUtils.styleMenuButton(btnUsers);
@@ -250,19 +347,19 @@ public class AdminDashboard extends javax.swing.JFrame {
         sidebarPanel.add(btnReports);
         sidebarPanel.add(Box.createVerticalGlue());
         
-        String spacedName = loggedInAdmin.getFullName().replaceAll("([a-z])([A-Z])", "$1 $2");
-        lblAdminName.setText(spacedName);
-        lblAdminName.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblAdminName.setText(loggedInAdmin.getFullName());
         lblAdminName.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblAdminName.setForeground(UIUtils.VINTAGE_CREAM.darker());
-        lblAdminName.setBorder(new EmptyBorder(10, 20, 10, 20));
+        lblAdminName.setMaximumSize(new Dimension(230, 50));
+        lblAdminName.setHorizontalAlignment(SwingConstants.CENTER);
+        lblAdminName.setBorder(new EmptyBorder(10, 10, 10, 10));
         sidebarPanel.add(lblAdminName);
         sidebarPanel.add(btnLogout);
 
         setActiveButton(btnDashboard);
     }
 
-    private void setupContent() {
+        private void setupContent() {
         headerPanel.setPreferredSize(new Dimension(getWidth(), 80));
         headerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 30, 25));
         lblHeaderTitle.setFont(new Font("Georgia", Font.BOLD, 28));
@@ -273,11 +370,40 @@ public class AdminDashboard extends javax.swing.JFrame {
         UIUtils.styleActionButton(btnAddRoster, UIUtils.VINTAGE_GOLD);
         UIUtils.styleActionButton(btnGenerateReport, UIUtils.VINTAGE_GOLD);
         UIUtils.styleActionButton(btnDeleteUser, UIUtils.VINTAGE_GOLD);
-
         
         styleTable(tblUsers);
         styleTable(tblRosters);
         styleTable(tblReports);
+
+        panelUsers.setLayout(new BorderLayout());
+        panelUsers.setBackground(UIUtils.VINTAGE_BG);
+        panelUsers.add(jPanel1, BorderLayout.NORTH); 
+        panelUsers.add(jScrollPane1, BorderLayout.CENTER); 
+        
+        jPanel1.setOpaque(true); 
+        jPanel1.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        jPanel1.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); 
+        jScrollPane1.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20)); 
+
+        panelRosters.setLayout(new BorderLayout());
+        panelRosters.setBackground(UIUtils.VINTAGE_BG);
+        panelRosters.add(jPanel2, BorderLayout.NORTH);
+        panelRosters.add(jScrollPane2, BorderLayout.CENTER);
+        
+        jPanel2.setOpaque(true);
+        jPanel2.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        jPanel2.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        jScrollPane2.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+
+        panelReports.setLayout(new BorderLayout());
+        panelReports.setBackground(UIUtils.VINTAGE_BG);
+        panelReports.add(jPanel3, BorderLayout.NORTH);
+        panelReports.add(jScrollPane3, BorderLayout.CENTER);
+        
+        jPanel3.setOpaque(true);
+        jPanel3.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        jPanel3.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        jScrollPane3.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
     }
     
     
@@ -381,7 +507,7 @@ public class AdminDashboard extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        lblHeaderTitle.setText("Admin");
+        lblHeaderTitle.setText("WELCOME ADMIN");
 
         javax.swing.GroupLayout headerPanelLayout = new javax.swing.GroupLayout(headerPanel);
         headerPanel.setLayout(headerPanelLayout);

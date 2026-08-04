@@ -65,6 +65,53 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         table.getTableHeader().setForeground(UIUtils.VINTAGE_GOLD); 
         table.getTableHeader().setBorder(null);
     }
+    
+    private void styleTableInteraction(JTable table) {
+        table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+                if (row > -1 && col > -1) {
+                    Object value = table.getValueAt(row, col);
+                    if (value != null && value.toString().length() > 20) {
+                        table.setToolTipText(value.toString());
+                    } else {
+                        table.setToolTipText(null);
+                    }
+                }
+            }
+        });
+        
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int row = table.getSelectedRow();
+                    int col = table.getSelectedColumn();
+                    if (row > -1 && col > -1) {
+                        Object value = table.getValueAt(row, col);
+                        if (value != null) {
+                            JTextArea textArea = new JTextArea(value.toString());
+                            textArea.setEditable(false);
+                            textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+                            textArea.setBackground(UIUtils.VINTAGE_SHADOW);
+                            textArea.setForeground(UIUtils.VINTAGE_CREAM);
+                            textArea.setLineWrap(true);
+                            textArea.setWrapStyleWord(true);
+                            textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                            
+                            JScrollPane scrollPane = new JScrollPane(textArea);
+                            scrollPane.setPreferredSize(new Dimension(400, 200));
+                            
+                            String colName = table.getColumnName(col);
+                            JOptionPane.showMessageDialog(ReceptionistDashboard.this, scrollPane, colName + " Details", JOptionPane.PLAIN_MESSAGE);
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     private void loadDashboardStats() {
         long totalAppts = apptService.getAllAppointments().size();
@@ -107,6 +154,26 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
             }
         }
         tblStudents.setModel(model);
+        
+        tblStudents.getColumnModel().getColumn(0).setMinWidth(80);
+        tblStudents.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblStudents.getColumnModel().getColumn(1).setMinWidth(100);
+        tblStudents.getColumnModel().getColumn(1).setPreferredWidth(100);
+        tblStudents.getColumnModel().getColumn(2).setMinWidth(150);
+        tblStudents.getColumnModel().getColumn(2).setPreferredWidth(180);
+        tblStudents.getColumnModel().getColumn(3).setMinWidth(180);
+        tblStudents.getColumnModel().getColumn(3).setPreferredWidth(200);
+        tblStudents.getColumnModel().getColumn(4).setMinWidth(100);
+        tblStudents.getColumnModel().getColumn(4).setPreferredWidth(110);
+        tblStudents.getColumnModel().getColumn(5).setMinWidth(120);
+        tblStudents.getColumnModel().getColumn(5).setPreferredWidth(130);
+        tblStudents.getColumnModel().getColumn(6).setMinWidth(120);
+        tblStudents.getColumnModel().getColumn(6).setPreferredWidth(130);
+        tblStudents.getColumnModel().getColumn(7).setMinWidth(80);
+        tblStudents.getColumnModel().getColumn(7).setPreferredWidth(90);
+        tblStudents.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        styleTableInteraction(tblStudents);
     }
 
     private void loadAppointmentsTable() {
@@ -119,6 +186,26 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
             model.addRow(new Object[]{ appt.getAppointmentId(), appt.getStudentUserId(), appt.getCounselorId(), appt.getBookingType(), appt.getAppointmentDate(), appt.getTimeRange(), appt.getStatus(), appt.getReason() });
         }
         tblAppointments.setModel(model);
+        
+        tblAppointments.getColumnModel().getColumn(0).setMinWidth(80);
+        tblAppointments.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblAppointments.getColumnModel().getColumn(1).setMinWidth(80);
+        tblAppointments.getColumnModel().getColumn(1).setPreferredWidth(80);
+        tblAppointments.getColumnModel().getColumn(2).setMinWidth(100);
+        tblAppointments.getColumnModel().getColumn(2).setPreferredWidth(110);
+        tblAppointments.getColumnModel().getColumn(3).setMinWidth(80);
+        tblAppointments.getColumnModel().getColumn(3).setPreferredWidth(80);
+        tblAppointments.getColumnModel().getColumn(4).setMinWidth(100);
+        tblAppointments.getColumnModel().getColumn(4).setPreferredWidth(100);
+        tblAppointments.getColumnModel().getColumn(5).setMinWidth(100);
+        tblAppointments.getColumnModel().getColumn(5).setPreferredWidth(100);
+        tblAppointments.getColumnModel().getColumn(6).setMinWidth(90);
+        tblAppointments.getColumnModel().getColumn(6).setPreferredWidth(90);
+        tblAppointments.getColumnModel().getColumn(7).setMinWidth(200);
+        tblAppointments.getColumnModel().getColumn(7).setPreferredWidth(300);
+        tblAppointments.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        styleTableInteraction(tblAppointments);
     }
 
     private void loadQueueTable() {
@@ -131,8 +218,20 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
             model.addRow(new Object[]{ q.getAppointmentId(), q.getDisplayQueueNo(), q.getQueueStatus(), q.getIssuedAt() });
         }
         tblQueue.setModel(model);
+        
+        tblQueue.getColumnModel().getColumn(0).setMinWidth(100);
+        tblQueue.getColumnModel().getColumn(0).setPreferredWidth(150);
+        tblQueue.getColumnModel().getColumn(1).setMinWidth(100);
+        tblQueue.getColumnModel().getColumn(1).setPreferredWidth(150);
+        tblQueue.getColumnModel().getColumn(2).setMinWidth(100);
+        tblQueue.getColumnModel().getColumn(2).setPreferredWidth(150);
+        tblQueue.getColumnModel().getColumn(3).setMinWidth(150);
+        tblQueue.getColumnModel().getColumn(3).setPreferredWidth(200);
+        tblQueue.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        styleTableInteraction(tblQueue);
     }
-
+    
     private void setActiveButton(JButton activeBtn) {
         JButton[] buttons = {btnDashboard, btnStudents, btnAppointments, btnQueue};
         for (JButton btn : buttons) {
@@ -152,10 +251,10 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         panelStudents.setBackground(UIUtils.VINTAGE_BG);
         panelAppointments.setBackground(UIUtils.VINTAGE_BG);
         panelQueue.setBackground(UIUtils.VINTAGE_BG);
-        card1.setBackground(UIUtils.VINTAGE_PANEL); 
-        card2.setBackground(UIUtils.VINTAGE_PANEL);
-        card3.setBackground(UIUtils.VINTAGE_PANEL); 
-        card4.setBackground(UIUtils.VINTAGE_PANEL);
+        card1.setBackground(UIUtils.VINTAGE_ROSE); 
+        card2.setBackground(UIUtils.VINTAGE_ROSE);
+        card3.setBackground(UIUtils.VINTAGE_ROSE); 
+        card4.setBackground(UIUtils.VINTAGE_ROSE);
         lblHeaderTitle.setForeground(UIUtils.VINTAGE_GOLD);
         lblReceptionistName.setForeground(UIUtils.VINTAGE_CREAM.darker());
         SwingUtilities.updateComponentTreeUI(this);
@@ -212,20 +311,21 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         setupContent();
     }
 
-    private void setupSidebar() {
+        private void setupSidebar() {
         sidebarPanel.setPreferredSize(new Dimension(250, getHeight()));
         sidebarPanel.setLayout(new BoxLayout(sidebarPanel, BoxLayout.Y_AXIS));
-        sidebarPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
-        sidebarPanel.setBackground(UIUtils.VINTAGE_ROSE);
+        sidebarPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
+        sidebarPanel.setBackground(UIUtils.VINTAGE_PANEL);
         sidebarPanel.removeAll();
-        JLabel lblLogo = new JLabel("CMS");
-        lblLogo.setFont(new Font("Georgia", Font.BOLD, 40));
-        lblLogo.setForeground(UIUtils.VINTAGE_GOLD);
-        lblLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblLogo.setBorder(new EmptyBorder(0, 0, 30, 0));
-        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-        lblLogo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
-        sidebarPanel.add(lblLogo);
+
+        JPanel avatarWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        avatarWrapper.setOpaque(false);
+        avatarWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+
+        UIUtils.AvatarLabel avatar = new UIUtils.AvatarLabel(loggedInReceptionist.getUserId(), loggedInReceptionist.getFullName(), 100);
+        avatarWrapper.add(avatar);
+        avatarWrapper.setBorder(new EmptyBorder(10, 0, 20, 0));
+        sidebarPanel.add(avatarWrapper);
 
         UIUtils.styleMenuButton(btnDashboard);
         UIUtils.styleMenuButton(btnStudents);
@@ -251,19 +351,19 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         sidebarPanel.add(btnQueue);
         sidebarPanel.add(Box.createVerticalGlue());
         
-        String spacedName = loggedInReceptionist.getFullName().replaceAll("([a-z])([A-Z])", "$1 $2");
-        lblReceptionistName.setText(spacedName);
-        lblReceptionistName.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblReceptionistName.setText(loggedInReceptionist.getFullName());
         lblReceptionistName.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblReceptionistName.setForeground(UIUtils.VINTAGE_CREAM.darker());
-        lblReceptionistName.setBorder(new EmptyBorder(10, 20, 10, 20));
+        lblReceptionistName.setMaximumSize(new Dimension(230, 50)); 
+        lblReceptionistName.setHorizontalAlignment(SwingConstants.CENTER);
+        lblReceptionistName.setBorder(new EmptyBorder(10, 10, 10, 10));
         sidebarPanel.add(lblReceptionistName);
         sidebarPanel.add(btnLogout);
-
         setActiveButton(btnDashboard);
+        
     }
 
-    private void setupContent() {
+        private void setupContent() {
         headerPanel.setPreferredSize(new Dimension(getWidth(), 80));
         headerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 30, 25));
         lblHeaderTitle.setFont(new Font("Georgia", Font.BOLD, 28));
@@ -283,6 +383,34 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         styleTable(tblStudents);
         styleTable(tblAppointments);
         styleTable(tblQueue);
+
+        panelStudents.setLayout(new BorderLayout());
+        panelStudents.setBackground(UIUtils.VINTAGE_BG);
+        panelStudents.add(jPanel1, BorderLayout.NORTH); 
+        panelStudents.add(jScrollPane1, BorderLayout.CENTER); 
+        
+        jPanel1.setOpaque(true); 
+        jPanel1.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); 
+        jScrollPane1.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20)); 
+
+        panelAppointments.setLayout(new BorderLayout());
+        panelAppointments.setBackground(UIUtils.VINTAGE_BG);
+        panelAppointments.add(jPanel2, BorderLayout.NORTH);
+        panelAppointments.add(jScrollPane2, BorderLayout.CENTER);
+        
+        jPanel2.setOpaque(true);
+        jPanel2.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        jScrollPane2.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+
+        panelQueue.setLayout(new BorderLayout());
+        panelQueue.setBackground(UIUtils.VINTAGE_BG);
+        panelQueue.add(jPanel3, BorderLayout.NORTH);
+        panelQueue.add(jScrollPane3, BorderLayout.CENTER);
+        
+        jPanel3.setOpaque(true);
+        jPanel3.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10)); // Keep your custom flow layout
+        jPanel3.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        jScrollPane3.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
     }
     
     

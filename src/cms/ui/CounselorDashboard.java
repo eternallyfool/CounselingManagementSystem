@@ -63,6 +63,53 @@ public class CounselorDashboard extends javax.swing.JFrame {
         table.getTableHeader().setForeground(UIUtils.VINTAGE_GOLD); 
         table.getTableHeader().setBorder(null);
     }
+    
+    private void styleTableInteraction(JTable table) {
+        table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+                if (row > -1 && col > -1) {
+                    Object value = table.getValueAt(row, col);
+                    if (value != null && value.toString().length() > 20) {
+                        table.setToolTipText(value.toString());
+                    } else {
+                        table.setToolTipText(null);
+                    }
+                }
+            }
+        });
+        
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int row = table.getSelectedRow();
+                    int col = table.getSelectedColumn();
+                    if (row > -1 && col > -1) {
+                        Object value = table.getValueAt(row, col);
+                        if (value != null) {
+                            JTextArea textArea = new JTextArea(value.toString());
+                            textArea.setEditable(false);
+                            textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+                            textArea.setBackground(UIUtils.VINTAGE_SHADOW);
+                            textArea.setForeground(UIUtils.VINTAGE_CREAM);
+                            textArea.setLineWrap(true);
+                            textArea.setWrapStyleWord(true);
+                            textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                            
+                            JScrollPane scrollPane = new JScrollPane(textArea);
+                            scrollPane.setPreferredSize(new Dimension(400, 200));
+                            
+                            String colName = table.getColumnName(col);
+                            JOptionPane.showMessageDialog(CounselorDashboard.this, scrollPane, colName + " Details", JOptionPane.PLAIN_MESSAGE);
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     private void loadDashboardStats() {
         List<Appointment> myAppts = apptService.getAppointmentsForCounselor(loggedInCounselor.getUserId());
@@ -103,6 +150,22 @@ public class CounselorDashboard extends javax.swing.JFrame {
             model.addRow(new Object[]{ r.getRosterId(), r.getWorkDate(), r.getStartTime(), r.getEndTime(), r.getRoom(), r.getAvailabilityStatus() });
         }
         tblRoster.setModel(model);
+        
+        tblRoster.getColumnModel().getColumn(0).setMinWidth(80); 
+        tblRoster.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblRoster.getColumnModel().getColumn(1).setMinWidth(100);
+        tblRoster.getColumnModel().getColumn(1).setPreferredWidth(100);
+        tblRoster.getColumnModel().getColumn(2).setMinWidth(80); 
+        tblRoster.getColumnModel().getColumn(2).setPreferredWidth(80);
+        tblRoster.getColumnModel().getColumn(3).setMinWidth(80);
+        tblRoster.getColumnModel().getColumn(3).setPreferredWidth(80);
+        tblRoster.getColumnModel().getColumn(4).setMinWidth(150);
+        tblRoster.getColumnModel().getColumn(4).setPreferredWidth(200);
+        tblRoster.getColumnModel().getColumn(5).setMinWidth(100); 
+        tblRoster.getColumnModel().getColumn(5).setPreferredWidth(100);
+        tblRoster.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        styleTableInteraction(tblRoster);
     }
 
     private void loadAppointmentsTable() {
@@ -115,6 +178,24 @@ public class CounselorDashboard extends javax.swing.JFrame {
             model.addRow(new Object[]{ appt.getAppointmentId(), appt.getStudentUserId(), appt.getBookingType(), appt.getAppointmentDate(), appt.getTimeRange(), appt.getStatus(), appt.getReason() });
         }
         tblAppointments.setModel(model);
+        
+        tblAppointments.getColumnModel().getColumn(0).setMinWidth(80);
+        tblAppointments.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblAppointments.getColumnModel().getColumn(1).setMinWidth(110);
+        tblAppointments.getColumnModel().getColumn(1).setPreferredWidth(110);
+        tblAppointments.getColumnModel().getColumn(2).setMinWidth(80);
+        tblAppointments.getColumnModel().getColumn(2).setPreferredWidth(80);
+        tblAppointments.getColumnModel().getColumn(3).setMinWidth(100);
+        tblAppointments.getColumnModel().getColumn(3).setPreferredWidth(100);
+        tblAppointments.getColumnModel().getColumn(4).setMinWidth(100); 
+        tblAppointments.getColumnModel().getColumn(4).setPreferredWidth(100);
+        tblAppointments.getColumnModel().getColumn(5).setMinWidth(90); 
+        tblAppointments.getColumnModel().getColumn(5).setPreferredWidth(90);
+        tblAppointments.getColumnModel().getColumn(6).setMinWidth(200);
+        tblAppointments.getColumnModel().getColumn(6).setPreferredWidth(300);
+        tblAppointments.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        styleTableInteraction(tblAppointments);
     }
 
     private void loadRecordsTable() {
@@ -127,6 +208,21 @@ public class CounselorDashboard extends javax.swing.JFrame {
             model.addRow(new Object[]{ record.getRecordId(), record.getAppointmentId(), record.getNotes(), record.getRecommendation(), record.getFollowUpDate() });
         }
         tblRecords.setModel(model);
+        
+
+        tblRecords.getColumnModel().getColumn(0).setMinWidth(80);
+        tblRecords.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblRecords.getColumnModel().getColumn(1).setMinWidth(80);
+        tblRecords.getColumnModel().getColumn(1).setPreferredWidth(80);
+        tblRecords.getColumnModel().getColumn(2).setMinWidth(250);
+        tblRecords.getColumnModel().getColumn(2).setPreferredWidth(300);
+        tblRecords.getColumnModel().getColumn(3).setMinWidth(250);
+        tblRecords.getColumnModel().getColumn(3).setPreferredWidth(300);
+        tblRecords.getColumnModel().getColumn(4).setMinWidth(120);
+        tblRecords.getColumnModel().getColumn(4).setPreferredWidth(120);
+        tblRecords.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        styleTableInteraction(tblRecords);
     }
 
     private void setActiveButton(JButton activeBtn) {
@@ -141,17 +237,17 @@ public class CounselorDashboard extends javax.swing.JFrame {
 
     private void updateThemeColors() {
         getContentPane().setBackground(UIUtils.VINTAGE_BG);
-        sidebarPanel.setBackground(UIUtils.VINTAGE_PANEL); // Espresso sidebar
+        sidebarPanel.setBackground(UIUtils.VINTAGE_PANEL);
         headerPanel.setBackground(UIUtils.VINTAGE_BG);
         contentPanel.setBackground(UIUtils.VINTAGE_BG);
         panelDashboard.setBackground(UIUtils.VINTAGE_BG);
         panelRoster.setBackground(UIUtils.VINTAGE_BG);
         panelAppointments.setBackground(UIUtils.VINTAGE_BG);
         panelRecords.setBackground(UIUtils.VINTAGE_BG);
-        card1.setBackground(UIUtils.VINTAGE_PANEL); 
-        card2.setBackground(UIUtils.VINTAGE_PANEL);
-        card3.setBackground(UIUtils.VINTAGE_PANEL); 
-        card4.setBackground(UIUtils.VINTAGE_PANEL);
+        card1.setBackground(UIUtils.VINTAGE_ROSE); 
+        card2.setBackground(UIUtils.VINTAGE_ROSE);
+        card3.setBackground(UIUtils.VINTAGE_ROSE); 
+        card4.setBackground(UIUtils.VINTAGE_ROSE);
         lblHeaderTitle.setForeground(UIUtils.VINTAGE_GOLD);
         lblCounselorName.setForeground(UIUtils.VINTAGE_CREAM.darker());
         SwingUtilities.updateComponentTreeUI(this);
@@ -215,21 +311,21 @@ public class CounselorDashboard extends javax.swing.JFrame {
         setupContent();
     }
 
-    private void setupSidebar() {
+        private void setupSidebar() {
         sidebarPanel.setPreferredSize(new Dimension(250, getHeight()));
         sidebarPanel.setLayout(new BoxLayout(sidebarPanel, BoxLayout.Y_AXIS));
-        sidebarPanel.setBorder(new EmptyBorder(20, 10, 20, 10));
-        sidebarPanel.setBackground(UIUtils.VINTAGE_ROSE);
+        sidebarPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
+        sidebarPanel.setBackground(UIUtils.VINTAGE_PANEL);
         sidebarPanel.removeAll();
 
-        JLabel lblLogo = new JLabel("CMS");
-        lblLogo.setFont(new Font("Georgia", Font.BOLD, 40));
-        lblLogo.setForeground(UIUtils.VINTAGE_GOLD);
-        lblLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblLogo.setBorder(new EmptyBorder(20, 0, 40, 0));
-        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-        lblLogo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
-        sidebarPanel.add(lblLogo);
+        JPanel avatarWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        avatarWrapper.setOpaque(false);
+        avatarWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+
+        UIUtils.AvatarLabel avatar = new UIUtils.AvatarLabel(loggedInCounselor.getUserId(), loggedInCounselor.getFullName(), 100);
+        avatarWrapper.add(avatar);
+        avatarWrapper.setBorder(new EmptyBorder(10, 0, 20, 0));
+        sidebarPanel.add(avatarWrapper);
 
         UIUtils.styleMenuButton(btnDashboard);
         UIUtils.styleMenuButton(btnRoster);
@@ -255,19 +351,19 @@ public class CounselorDashboard extends javax.swing.JFrame {
         sidebarPanel.add(btnRecords);
         sidebarPanel.add(Box.createVerticalGlue());
         
-        String spacedName = loggedInCounselor.getFullName().replaceAll("([a-z])([A-Z])", "$1 $2");
-        lblCounselorName.setText(spacedName);
-        lblCounselorName.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblCounselorName.setText(loggedInCounselor.getFullName());
         lblCounselorName.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblCounselorName.setForeground(UIUtils.VINTAGE_CREAM.darker());
-        lblCounselorName.setBorder(new EmptyBorder(10, 20, 10, 20));
+        lblCounselorName.setForeground(UIUtils.VINTAGE_CREAM.darker()); 
+        lblCounselorName.setMaximumSize(new Dimension(230, 50)); 
+        lblCounselorName.setHorizontalAlignment(SwingConstants.CENTER);
+        lblCounselorName.setBorder(new EmptyBorder(10, 10, 10, 10));
         sidebarPanel.add(lblCounselorName);
         sidebarPanel.add(btnLogout);
 
         setActiveButton(btnDashboard);
     }
 
-    private void setupContent() {
+        private void setupContent() {
         headerPanel.setPreferredSize(new Dimension(getWidth(), 80));
         headerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 30, 25));
         lblHeaderTitle.setFont(new Font("Georgia", Font.BOLD, 28));
@@ -278,6 +374,26 @@ public class CounselorDashboard extends javax.swing.JFrame {
         styleTable(tblRoster);
         styleTable(tblAppointments);
         styleTable(tblRecords);
+
+        panelRoster.setLayout(new BorderLayout());
+        panelRoster.setBackground(UIUtils.VINTAGE_BG);
+        panelRoster.add(jScrollPane1, BorderLayout.CENTER);
+        jScrollPane1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); 
+
+        panelAppointments.setLayout(new BorderLayout());
+        panelAppointments.setBackground(UIUtils.VINTAGE_BG);
+        panelAppointments.add(jPanel2, BorderLayout.NORTH); 
+        panelAppointments.add(jScrollPane2, BorderLayout.CENTER); 
+        
+        jPanel2.setOpaque(true); 
+        jPanel2.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); 
+        jPanel2.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        jScrollPane2.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20)); 
+
+        panelRecords.setLayout(new BorderLayout());
+        panelRecords.setBackground(UIUtils.VINTAGE_BG);
+        panelRecords.add(jScrollPane3, BorderLayout.CENTER);
+        jScrollPane3.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     }
     
     
@@ -379,14 +495,14 @@ public class CounselorDashboard extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        lblHeaderTitle.setText("Counselor");
+        lblHeaderTitle.setText("WELCOME COUNSELOR");
 
         javax.swing.GroupLayout headerPanelLayout = new javax.swing.GroupLayout(headerPanel);
         headerPanel.setLayout(headerPanelLayout);
         headerPanelLayout.setHorizontalGroup(
             headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, headerPanelLayout.createSequentialGroup()
-                .addContainerGap(72, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblHeaderTitle)
                 .addGap(70, 70, 70))
         );

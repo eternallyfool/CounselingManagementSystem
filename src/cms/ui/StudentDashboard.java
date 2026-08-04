@@ -24,6 +24,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import java.util.List;
+import cms.core.UserService;
+import cms.core.User;
 
 public class StudentDashboard extends javax.swing.JFrame {
 
@@ -31,6 +33,7 @@ public class StudentDashboard extends javax.swing.JFrame {
     private AppointmentService apptService;
     private QueueService queueService;
     private CounselorProfileService counselorService;
+    private UserService userService;
 
     public StudentDashboard(User student) {
         setUndecorated(true);
@@ -40,12 +43,13 @@ public class StudentDashboard extends javax.swing.JFrame {
         this.apptService = new AppointmentService();
         this.queueService = new QueueService();
         this.counselorService = new CounselorProfileService();
+        this.userService = new UserService();
         
         applyDesign();
         loadDashboardStats();
         loadAppointmentsTable();
         loadQueueTable();
-        loadCounselorsTable();
+        loadCounselorCards();
     }
     
     private void styleTable(JTable table) {
@@ -102,6 +106,78 @@ public class StudentDashboard extends javax.swing.JFrame {
             model.addRow(new Object[]{ appt.getAppointmentId(), appt.getCounselorId(), appt.getBookingType(), appt.getAppointmentDate(), appt.getTimeRange(), appt.getStatus(), appt.getReason() });
         }
         tblAppointments.setModel(model);
+        
+
+        tblAppointments.getColumnModel().getColumn(0).setMinWidth(80); 
+        tblAppointments.getColumnModel().getColumn(0).setPreferredWidth(80);
+        
+        tblAppointments.getColumnModel().getColumn(1).setMinWidth(110);
+        tblAppointments.getColumnModel().getColumn(1).setPreferredWidth(110);
+        
+        tblAppointments.getColumnModel().getColumn(2).setMinWidth(80);
+        tblAppointments.getColumnModel().getColumn(2).setPreferredWidth(80);
+        
+        tblAppointments.getColumnModel().getColumn(3).setMinWidth(100);
+        tblAppointments.getColumnModel().getColumn(3).setPreferredWidth(100);
+        
+        tblAppointments.getColumnModel().getColumn(4).setMinWidth(100);
+        tblAppointments.getColumnModel().getColumn(4).setPreferredWidth(100);
+        
+        tblAppointments.getColumnModel().getColumn(5).setMinWidth(90);
+        tblAppointments.getColumnModel().getColumn(5).setPreferredWidth(90);
+        
+        tblAppointments.getColumnModel().getColumn(6).setMinWidth(200); 
+        tblAppointments.getColumnModel().getColumn(6).setPreferredWidth(300);
+        
+        tblAppointments.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        tblAppointments.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+     
+    @Override
+    public void mouseMoved(java.awt.event.MouseEvent e) {
+        int row = tblAppointments.rowAtPoint(e.getPoint());
+        int col = tblAppointments.columnAtPoint(e.getPoint());
+            if (row > -1 && col > -1) {
+                Object value = tblAppointments.getValueAt(row, col);
+                    if (value != null && value.toString().length() > 20) {
+                        tblAppointments.setToolTipText(value.toString());
+                    } else {
+                        tblAppointments.setToolTipText(null);
+                    }
+                }
+            }
+        });
+        
+        tblAppointments.addMouseListener(new java.awt.event.MouseAdapter() {
+            
+        @Override
+        public void mouseClicked(java.awt.event.MouseEvent e) {
+            if (e.getClickCount() == 2) { 
+                    int row = tblAppointments.getSelectedRow();
+                    int col = tblAppointments.getSelectedColumn();
+                    if (row > -1 && col > -1) {
+                        Object value = tblAppointments.getValueAt(row, col);
+                        if (value != null) {
+
+                            JTextArea textArea = new JTextArea(value.toString());
+                            textArea.setEditable(false);
+                            textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+                            textArea.setBackground(UIUtils.VINTAGE_SHADOW);
+                            textArea.setForeground(UIUtils.VINTAGE_CREAM);
+                            textArea.setLineWrap(true);
+                            textArea.setWrapStyleWord(true);
+                            textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                            
+                            JScrollPane scrollPane = new JScrollPane(textArea);
+                            scrollPane.setPreferredSize(new Dimension(400, 200));
+                            
+                            String colName = tblAppointments.getColumnName(col);
+                            JOptionPane.showMessageDialog(StudentDashboard.this, scrollPane, colName + " Details", JOptionPane.PLAIN_MESSAGE);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void loadQueueTable() {
@@ -116,16 +192,78 @@ public class StudentDashboard extends javax.swing.JFrame {
         tblQueue.setModel(model);
     }
 
-    private void loadCounselorsTable() {
-        String[] columns = {"Counselor ID", "Email", "Phone", "Specializations"};
-        DefaultTableModel model = new DefaultTableModel(columns, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) { return false; }
-        };
-        for (CounselorProfile profile : counselorService.getAllProfiles()) {
-            model.addRow(new Object[]{ profile.getCounselorId(), profile.getEmail(), profile.getPhone(), profile.getSpecialization() });
+    private void loadCounselorCards() {
+        counselorGridPanel.removeAll();
+        counselorGridPanel.setBackground(UIUtils.VINTAGE_BG);
+        
+        List<CounselorProfile> profiles = counselorService.getAllProfiles();
+        
+        for (CounselorProfile profile : profiles) {
+            User counselorUser = userService.findById(profile.getCounselorId());
+            String rawName = counselorUser != null ? counselorUser.getFullName() : profile.getCounselorId();
+            String fullName = rawName.replaceAll("([a-z])([A-Z])", "$1 $2");
+            
+            JPanel card = new JPanel(new BorderLayout(0, 10));
+            card.setBackground(UIUtils.VINTAGE_PANEL);
+            card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            
+            UIUtils.AvatarLabel avatar = new UIUtils.AvatarLabel(profile.getCounselorId(), fullName, 120);
+            JPanel imgPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+            imgPanel.setBackground(UIUtils.VINTAGE_PANEL);
+            imgPanel.add(avatar);
+            card.add(imgPanel, BorderLayout.NORTH);
+            
+            JPanel infoPanel = new JPanel();
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+            infoPanel.setBackground(UIUtils.VINTAGE_PANEL);
+            
+            JLabel lblName = new JLabel(fullName, SwingConstants.CENTER);
+            lblName.setFont(new Font("Segoe UI", Font.BOLD, 16));
+            lblName.setForeground(UIUtils.VINTAGE_GOLD);
+            lblName.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+            JLabel lblId = new JLabel("ID: " + profile.getCounselorId());
+            lblId.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            lblId.setForeground(UIUtils.VINTAGE_CREAM);
+            lblId.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+            JLabel lblSpec = new JLabel(profile.getSpecialization());
+            lblSpec.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+            lblSpec.setForeground(UIUtils.VINTAGE_CREAM.darker());
+            lblSpec.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+            JLabel lblEmail = new JLabel(profile.getEmail());
+            lblEmail.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            lblEmail.setForeground(UIUtils.VINTAGE_CREAM.darker());
+            lblEmail.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+            JLabel lblPhone = new JLabel(profile.getPhone());
+            lblPhone.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            lblPhone.setForeground(UIUtils.VINTAGE_CREAM.darker());
+            lblPhone.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+            infoPanel.add(lblName);
+            infoPanel.add(Box.createVerticalStrut(5));
+            infoPanel.add(lblId);
+            infoPanel.add(Box.createVerticalStrut(8));
+            infoPanel.add(lblSpec);
+            infoPanel.add(Box.createVerticalStrut(8));
+            infoPanel.add(lblEmail);
+            infoPanel.add(Box.createVerticalStrut(5));
+            infoPanel.add(lblPhone);
+            
+            card.add(infoPanel, BorderLayout.CENTER);
+            counselorGridPanel.add(card);
         }
-        tblCounselors.setModel(model);
+        
+        if (profiles.isEmpty()) {
+            JLabel emptyLbl = new JLabel("No counselor profiles available.");
+            emptyLbl.setForeground(UIUtils.VINTAGE_CREAM);
+            counselorGridPanel.add(emptyLbl);
+        }
+        
+        counselorGridPanel.revalidate();
+        counselorGridPanel.repaint();
     }
 
     private void setActiveButton(JButton activeBtn) {
@@ -147,10 +285,10 @@ public class StudentDashboard extends javax.swing.JFrame {
         panelAppointments.setBackground(UIUtils.VINTAGE_BG);
         panelQueue.setBackground(UIUtils.VINTAGE_BG);
         panelCounselors.setBackground(UIUtils.VINTAGE_BG);
-        card1.setBackground(UIUtils.VINTAGE_PANEL); 
-        card2.setBackground(UIUtils.VINTAGE_PANEL);
-        card3.setBackground(UIUtils.VINTAGE_PANEL); 
-        card4.setBackground(UIUtils.VINTAGE_PANEL);
+        card1.setBackground(UIUtils.VINTAGE_ROSE); 
+        card2.setBackground(UIUtils.VINTAGE_ROSE);
+        card3.setBackground(UIUtils.VINTAGE_ROSE); 
+        card4.setBackground(UIUtils.VINTAGE_ROSE);
         lblHeaderTitle.setForeground(UIUtils.VINTAGE_GOLD);
         lblStudentName.setForeground(UIUtils.VINTAGE_CREAM.darker());
         SwingUtilities.updateComponentTreeUI(this);
@@ -209,20 +347,20 @@ public class StudentDashboard extends javax.swing.JFrame {
         private void setupSidebar() {
         sidebarPanel.setPreferredSize(new Dimension(250, getHeight()));
         sidebarPanel.setLayout(new BoxLayout(sidebarPanel, BoxLayout.Y_AXIS));
-        sidebarPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
-        sidebarPanel.setBackground(UIUtils.VINTAGE_ROSE);
+        sidebarPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
+        sidebarPanel.setBackground(UIUtils.VINTAGE_PANEL);
         sidebarPanel.removeAll();
 
-        JLabel lblLogo = new JLabel("CMS");
-        lblLogo.setFont(new Font("Georgia", Font.BOLD, 40));
-        lblLogo.setForeground(UIUtils.VINTAGE_GOLD);
-        lblLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-        lblLogo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
-        lblLogo.setBorder(new EmptyBorder(0, 0, 30, 0));
-        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-        lblLogo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
-        sidebarPanel.add(lblLogo);
+        JPanel avatarWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        avatarWrapper.setOpaque(false); 
+        avatarWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120)); 
+
+        UIUtils.AvatarLabel avatar = new UIUtils.AvatarLabel(loggedInStudent.getUserId(), loggedInStudent.getFullName(), 100);
+        avatarWrapper.add(avatar);
+        
+        avatarWrapper.setBorder(new EmptyBorder(10, 0, 20, 0));
+        
+        sidebarPanel.add(avatarWrapper);
 
         UIUtils.styleMenuButton(btnDashboard);
         UIUtils.styleMenuButton(btnAppointments);
@@ -248,18 +386,18 @@ public class StudentDashboard extends javax.swing.JFrame {
         sidebarPanel.add(btnCounselors);
         sidebarPanel.add(Box.createVerticalGlue());
         
-        String formattedName = loggedInStudent.getFullName().replaceAll("([A-Z])", " $1").trim();
-        lblStudentName.setText(" " + formattedName);
+        lblStudentName.setText(loggedInStudent.getFullName());
         lblStudentName.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblStudentName.setForeground(UIUtils.VINTAGE_CREAM.darker());
-        lblStudentName.setBorder(new EmptyBorder(10, 20, 10, 20));
+        lblStudentName.setMaximumSize(new Dimension(230, 50)); 
+        lblStudentName.setHorizontalAlignment(SwingConstants.CENTER);
+        lblStudentName.setBorder(new EmptyBorder(10, 10, 10, 10));
         sidebarPanel.add(lblStudentName);
         sidebarPanel.add(btnLogout);
-
         setActiveButton(btnDashboard);
     }
 
-    private void setupContent() {
+        private void setupContent() {
         headerPanel.setPreferredSize(new Dimension(getWidth(), 80));
         headerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 30, 25));
         lblHeaderTitle.setFont(new Font("Georgia", Font.BOLD, 28));
@@ -271,7 +409,28 @@ public class StudentDashboard extends javax.swing.JFrame {
         
         styleTable(tblAppointments);
         styleTable(tblQueue);
-        styleTable(tblCounselors);
+        
+        panelAppointments.setLayout(new BorderLayout());
+        panelAppointments.setBackground(UIUtils.VINTAGE_BG);
+        panelAppointments.add(jPanel1, BorderLayout.NORTH); 
+        panelAppointments.add(jScrollPane1, BorderLayout.CENTER); 
+        
+        jPanel1.setOpaque(true); 
+        jPanel1.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        
+        jScrollPane1.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20)); 
+
+        panelQueue.setLayout(new BorderLayout());
+        panelQueue.setBackground(UIUtils.VINTAGE_BG);
+        panelQueue.add(jScrollPane2, BorderLayout.CENTER);
+        jScrollPane2.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); 
+
+        panelCounselors.setLayout(new BorderLayout());
+        panelCounselors.setBackground(UIUtils.VINTAGE_BG);
+        panelCounselors.add(jScrollPane3, BorderLayout.CENTER);
+        jScrollPane3.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        jScrollPane3.setBackground(UIUtils.VINTAGE_BG);
+        counselorGridPanel.setBackground(UIUtils.VINTAGE_BG);
     }
 
     /**
@@ -310,7 +469,7 @@ public class StudentDashboard extends javax.swing.JFrame {
         tblQueue = new javax.swing.JTable();
         panelCounselors = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        tblCounselors = new javax.swing.JTable();
+        counselorGridPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -375,14 +534,14 @@ public class StudentDashboard extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        lblHeaderTitle.setText("Student");
+        lblHeaderTitle.setText("WELCOME STUDENT");
 
         javax.swing.GroupLayout headerPanelLayout = new javax.swing.GroupLayout(headerPanel);
         headerPanel.setLayout(headerPanelLayout);
         headerPanelLayout.setHorizontalGroup(
             headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, headerPanelLayout.createSequentialGroup()
-                .addContainerGap(72, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblHeaderTitle)
                 .addGap(70, 70, 70))
         );
@@ -402,7 +561,7 @@ public class StudentDashboard extends javax.swing.JFrame {
         card1.setLayout(card1Layout);
         card1Layout.setHorizontalGroup(
             card1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 120, Short.MAX_VALUE)
+            .addGap(0, 130, Short.MAX_VALUE)
         );
         card1Layout.setVerticalGroup(
             card1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -415,7 +574,7 @@ public class StudentDashboard extends javax.swing.JFrame {
         card2.setLayout(card2Layout);
         card2Layout.setHorizontalGroup(
             card2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 120, Short.MAX_VALUE)
+            .addGap(0, 130, Short.MAX_VALUE)
         );
         card2Layout.setVerticalGroup(
             card2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -428,7 +587,7 @@ public class StudentDashboard extends javax.swing.JFrame {
         card3.setLayout(card3Layout);
         card3Layout.setHorizontalGroup(
             card3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 120, Short.MAX_VALUE)
+            .addGap(0, 130, Short.MAX_VALUE)
         );
         card3Layout.setVerticalGroup(
             card3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -441,7 +600,7 @@ public class StudentDashboard extends javax.swing.JFrame {
         card4.setLayout(card4Layout);
         card4Layout.setHorizontalGroup(
             card4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 120, Short.MAX_VALUE)
+            .addGap(0, 130, Short.MAX_VALUE)
         );
         card4Layout.setVerticalGroup(
             card4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -506,7 +665,7 @@ public class StudentDashboard extends javax.swing.JFrame {
             panelAppointmentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelAppointmentsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(panelAppointmentsLayout.createSequentialGroup()
                 .addGap(47, 47, 47)
@@ -546,7 +705,7 @@ public class StudentDashboard extends javax.swing.JFrame {
             panelQueueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelQueueLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
                 .addContainerGap())
         );
         panelQueueLayout.setVerticalGroup(
@@ -559,35 +718,23 @@ public class StudentDashboard extends javax.swing.JFrame {
 
         contentPanel.add(panelQueue, "cardQueue");
 
-        jScrollPane3.setPreferredSize(new java.awt.Dimension(50, 50));
-
-        tblCounselors.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane3.setViewportView(tblCounselors);
+        counselorGridPanel.setLayout(new java.awt.GridLayout(0, 3, 20, 20));
+        jScrollPane3.setViewportView(counselorGridPanel);
 
         javax.swing.GroupLayout panelCounselorsLayout = new javax.swing.GroupLayout(panelCounselors);
         panelCounselors.setLayout(panelCounselorsLayout);
         panelCounselorsLayout.setHorizontalGroup(
             panelCounselorsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelCounselorsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelCounselorsLayout.createSequentialGroup()
+                .addContainerGap(39, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40))
         );
         panelCounselorsLayout.setVerticalGroup(
             panelCounselorsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelCounselorsLayout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -658,6 +805,7 @@ public class StudentDashboard extends javax.swing.JFrame {
 
     private void btnBookApptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBookApptActionPerformed
         JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(UIUtils.VINTAGE_PANEL);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -676,7 +824,7 @@ public class StudentDashboard extends javax.swing.JFrame {
         JLabel lblCoun = new JLabel("Counselor ID:"); lblCoun.setForeground(UIUtils.VINTAGE_CREAM);
         JLabel lblType = new JLabel("Type:"); lblType.setForeground(UIUtils.VINTAGE_CREAM);
         JLabel lblDate = new JLabel("Date:"); lblDate.setForeground(UIUtils.VINTAGE_CREAM);
-        JLabel lblStart = new JLabel("Start"); lblStart.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblStart = new JLabel("Start:"); lblStart.setForeground(UIUtils.VINTAGE_CREAM);
         JLabel lblEnd = new JLabel("End:"); lblEnd.setForeground(UIUtils.VINTAGE_CREAM);
         JLabel lblReason = new JLabel("Reason:"); lblReason.setForeground(UIUtils.VINTAGE_CREAM);
 
@@ -831,6 +979,7 @@ public class StudentDashboard extends javax.swing.JFrame {
     private javax.swing.JPanel card3;
     private javax.swing.JPanel card4;
     private javax.swing.JPanel contentPanel;
+    private javax.swing.JPanel counselorGridPanel;
     private javax.swing.JPanel headerPanel;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -844,7 +993,6 @@ public class StudentDashboard extends javax.swing.JFrame {
     private javax.swing.JPanel panelQueue;
     private javax.swing.JPanel sidebarPanel;
     private javax.swing.JTable tblAppointments;
-    private javax.swing.JTable tblCounselors;
     private javax.swing.JTable tblQueue;
     // End of variables declaration//GEN-END:variables
 }
