@@ -891,22 +891,67 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_btnToggleStudentStatusActionPerformed
 
     private void btnBookApptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBookApptActionPerformed
-        int selectedRow = tblStudents.getSelectedRow();
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a student.", "NO SELECTION", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(UIUtils.VINTAGE_PANEL);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        String userId = tblStudents.getValueAt(selectedRow, 0).toString();
-        String currentStatus = tblStudents.getValueAt(selectedRow, 7).toString();
-        String newStatus = currentStatus.equals(User.STATUS_ACTIVE) ? User.STATUS_INACTIVE : User.STATUS_ACTIVE;
+        JTextField txtStudentId = new JTextField("U4"); 
+        JTextField txtCounselorId = new JTextField("U2"); 
+        String[] types = {Appointment.TYPE_ONLINE, Appointment.TYPE_WALK_IN};
+        JComboBox<String> cmbType = new JComboBox<>(types);
+        JTextField txtDate = new JTextField("2026-06-15");
+        JTextField txtStart = new JTextField("10:00");
+        JTextField txtEnd = new JTextField("10:30");
+        JTextField txtReason = new JTextField("Walk-in consultation");
 
-        try {
-            userService.setUserStatus(userId, newStatus);
-            JOptionPane.showMessageDialog(this, "Student status updated to " + newStatus, "SUCCESS", JOptionPane.INFORMATION_MESSAGE);
-            loadStudentsTable();
-        } catch (InvalidInputException | DataNotFoundException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        styleInputField(txtStudentId); styleInputField(txtCounselorId); styleInputField(txtDate);
+        styleInputField(txtStart); styleInputField(txtEnd); styleInputField(txtReason);
+        
+        JLabel lblStudent = new JLabel("Student ID:"); lblStudent.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblCounselor = new JLabel("Counselor ID:"); lblCounselor.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblType = new JLabel("Type:"); lblType.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblDate = new JLabel("Date:"); lblDate.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblStart = new JLabel("Start:"); lblStart.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblEnd = new JLabel("End:"); lblEnd.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblReason = new JLabel("Reason:"); lblReason.setForeground(UIUtils.VINTAGE_CREAM);
+
+        gbc.gridx = 0; gbc.gridy = 0; panel.add(lblStudent, gbc);
+        gbc.gridx = 1; panel.add(txtStudentId, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; panel.add(lblCounselor, gbc);
+        gbc.gridx = 1; panel.add(txtCounselorId, gbc);
+        gbc.gridx = 0; gbc.gridy = 2; panel.add(lblType, gbc);
+        gbc.gridx = 1; panel.add(cmbType, gbc);
+        gbc.gridx = 0; gbc.gridy = 3; panel.add(lblDate, gbc);
+        gbc.gridx = 1; panel.add(txtDate, gbc);
+        gbc.gridx = 0; gbc.gridy = 4; panel.add(lblStart, gbc);
+        gbc.gridx = 1; panel.add(txtStart, gbc);
+        gbc.gridx = 0; gbc.gridy = 5; panel.add(lblEnd, gbc);
+        gbc.gridx = 1; panel.add(txtEnd, gbc);
+        gbc.gridx = 0; gbc.gridy = 6; panel.add(lblReason, gbc);
+        gbc.gridx = 1; panel.add(txtReason, gbc);
+
+        int result = JOptionPane.showConfirmDialog(this, panel, "BOOK APPOINTMENT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                apptService.createAppointment(
+                    txtStudentId.getText().trim(),
+                    txtCounselorId.getText().trim(),
+                    cmbType.getSelectedItem().toString(),
+                    txtDate.getText().trim(),
+                    txtStart.getText().trim(),
+                    txtEnd.getText().trim(),
+                    txtReason.getText().trim(),
+                    loggedInReceptionist.getUserId() // The receptionist is the one creating it
+                );
+                JOptionPane.showMessageDialog(this, "Appointment booked successfully!", "SUCCESS", JOptionPane.INFORMATION_MESSAGE);
+                loadAppointmentsTable();
+                loadDashboardStats();
+            } catch (InvalidInputException | DataNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "VALIDATION ERROR", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }//GEN-LAST:event_btnBookApptActionPerformed
 
