@@ -155,7 +155,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace pref="72" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Component id="lblHeaderTitle" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
               </Group>
@@ -174,7 +174,7 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="lblHeaderTitle">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Receptionist"/>
+            <Property name="text" type="java.lang.String" value="WELCOME RECEPTIONIST"/>
           </Properties>
         </Component>
       </SubComponents>

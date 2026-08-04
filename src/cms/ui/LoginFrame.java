@@ -180,7 +180,7 @@ public class LoginFrame extends javax.swing.JFrame {
         btnClose.setText("X");
         btnClose.addActionListener(this::btnCloseActionPerformed);
 
-        lblTitle.setText("Welcome to Counseling Management System");
+        lblTitle.setText("Welcome Message");
 
         lblUsername.setText("Username:");
 
