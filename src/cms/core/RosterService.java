@@ -65,6 +65,26 @@ public class RosterService {
         roster.setAvailabilityStatus(availabilityStatus);
         rosterRepository.updateRoster(roster);
     }
+    
+        public void updateRoster(String rosterId, String counselorId, String workDate, String startTime,
+            String endTime, String room, String availabilityStatus)
+            throws InvalidInputException, DataNotFoundException {
+        validateRoster(counselorId, workDate, startTime, endTime, room, availabilityStatus);
+        
+        if (rosterRepository.findById(rosterId) == null) {
+            throw new DataNotFoundException("Roster was not found.");
+        }
+        
+        Roster updatedRoster = new Roster(rosterId, counselorId, workDate, startTime, endTime, room.trim(), availabilityStatus);
+        rosterRepository.updateRoster(updatedRoster);
+    }
+
+    public void deleteRoster(String rosterId) throws DataNotFoundException {
+        if (!rosterRepository.deleteRoster(rosterId)) {
+            throw new DataNotFoundException("Roster was not found.");
+        }
+    }
+    
 
     private void validateRoster(String counselorId, String workDate, String startTime,
             String endTime, String room, String availabilityStatus) throws InvalidInputException {

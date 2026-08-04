@@ -10,6 +10,7 @@ import cms.core.Roster;
 import cms.core.RosterService;
 import cms.core.ReportSummary;
 import cms.core.ReportService;
+import cms.core.Appointment;
 import cms.io.AppointmentFileRepository;
 import cms.exception.InvalidInputException;
 import cms.exception.DataNotFoundException;
@@ -225,9 +226,48 @@ public class AdminDashboard extends javax.swing.JFrame {
         
         styleTableInteraction(tblReports);
     }
+    
+        private void loadAppointmentStats() {
+        List<Appointment> allAppts = apptRepo.getAllAppointments();
+        
+        long total = allAppts.size();
+        long completed = allAppts.stream().filter(a -> a.getStatus().equals(Appointment.STATUS_COMPLETED)).count();
+        long cancelled = allAppts.stream().filter(a -> a.getStatus().equals(Appointment.STATUS_CANCELLED)).count();
+        long walkIn = allAppts.stream().filter(a -> a.getBookingType().equals(Appointment.TYPE_WALK_IN)).count();
+        long online = allAppts.stream().filter(a -> a.getBookingType().equals(Appointment.TYPE_ONLINE)).count();
+
+        setupStatCard(card5, "TOTAL APPOINTMENTS", String.valueOf(total), UIUtils.VINTAGE_GOLD);
+        setupStatCard(card6, "COMPLETED", String.valueOf(completed), UIUtils.VINTAGE_CREAM);
+        setupStatCard(card7, "CANCELLED", String.valueOf(cancelled), UIUtils.VINTAGE_CREAM);
+        setupStatCard(card8, "WALK-IN VS ONLINE", walkIn + " / " + online, UIUtils.VINTAGE_GOLD);
+        
+        String[] columns = {"Appt ID", "Student ID", "Counselor ID", "Type", "Date", "Status", "Reason"};
+        DefaultTableModel model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        for (Appointment appt : allAppts) {
+            model.addRow(new Object[]{ 
+                appt.getAppointmentId(), appt.getStudentUserId(), appt.getCounselorId(), 
+                appt.getBookingType(), appt.getAppointmentDate(), appt.getStatus(), appt.getReason() 
+            });
+        }
+        tblApptStats.setModel(model);
+        
+        tblApptStats.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblApptStats.getColumnModel().getColumn(1).setPreferredWidth(100);
+        tblApptStats.getColumnModel().getColumn(2).setPreferredWidth(100);
+        tblApptStats.getColumnModel().getColumn(3).setPreferredWidth(80);
+        tblApptStats.getColumnModel().getColumn(4).setPreferredWidth(100);
+        tblApptStats.getColumnModel().getColumn(5).setPreferredWidth(100);
+        tblApptStats.getColumnModel().getColumn(6).setPreferredWidth(250);
+        
+        panelAppointments.revalidate();
+        panelAppointments.repaint();
+    }
 
     private void setActiveButton(JButton activeBtn) {
-        JButton[] buttons = {btnDashboard, btnUsers, btnRosters, btnReports};
+        JButton[] buttons = {btnDashboard, btnUsers, btnRosters, btnReports, btnAppointments};
         for (JButton btn : buttons) {
             btn.setForeground(UIUtils.VINTAGE_CREAM.darker());
             btn.setBorder(new EmptyBorder(10, 15, 10, 20));
@@ -326,24 +366,28 @@ public class AdminDashboard extends javax.swing.JFrame {
         UIUtils.styleMenuButton(btnDashboard);
         UIUtils.styleMenuButton(btnUsers);
         UIUtils.styleMenuButton(btnRosters);
+        UIUtils.styleMenuButton(btnAppointments);
         UIUtils.styleMenuButton(btnReports);
         UIUtils.styleMenuButton(btnLogout);
         
         btnDashboard.setText(" DASHBOARD");
         btnUsers.setText(" MANAGE USERS");
         btnRosters.setText(" STAFF ROSTERS");
+        btnAppointments.setText(" APPOINTMENTS");
         btnReports.setText(" REPORTS");
         btnLogout.setText(" LOGOUT");
 
         btnDashboard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
         btnUsers.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
         btnRosters.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        btnAppointments.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
         btnReports.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
         btnLogout.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
 
         sidebarPanel.add(btnDashboard);
         sidebarPanel.add(btnUsers);
         sidebarPanel.add(btnRosters);
+        sidebarPanel.add(btnAppointments);
         sidebarPanel.add(btnReports);
         sidebarPanel.add(Box.createVerticalGlue());
         
@@ -368,6 +412,9 @@ public class AdminDashboard extends javax.swing.JFrame {
         UIUtils.styleActionButton(btnAddUser, UIUtils.VINTAGE_GOLD);
         UIUtils.styleActionButton(btnToggleStatus, UIUtils.VINTAGE_CREAM);
         UIUtils.styleActionButton(btnAddRoster, UIUtils.VINTAGE_GOLD);
+        UIUtils.styleActionButton(btnEditUser, UIUtils.VINTAGE_GOLD);
+        UIUtils.styleActionButton(btnEditRoster, UIUtils.VINTAGE_CREAM);
+        UIUtils.styleActionButton(btnDeleteRoster, UIUtils.VINTAGE_CREAM);
         UIUtils.styleActionButton(btnGenerateReport, UIUtils.VINTAGE_GOLD);
         UIUtils.styleActionButton(btnDeleteUser, UIUtils.VINTAGE_GOLD);
         
@@ -404,6 +451,35 @@ public class AdminDashboard extends javax.swing.JFrame {
         jPanel3.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10));
         jPanel3.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         jScrollPane3.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+        
+        UIUtils.styleMenuButton(btnAppointments);
+        btnAppointments.setText("APPOINTMENTS");
+        btnAppointments.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        
+        panelAppointments.setLayout(new BorderLayout());
+        panelAppointments.setBackground(UIUtils.VINTAGE_BG);
+        panelAppointments.removeAll();
+
+        JPanel apptCardsWrapper = new JPanel(new GridLayout(1, 4, 15, 0));
+        apptCardsWrapper.setBackground(UIUtils.VINTAGE_BG);
+        apptCardsWrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
+        apptCardsWrapper.setPreferredSize(new Dimension(getWidth(), 160));
+        
+        card5.setBackground(UIUtils.VINTAGE_PANEL); 
+        card6.setBackground(UIUtils.VINTAGE_PANEL);
+        card7.setBackground(UIUtils.VINTAGE_PANEL); 
+        card8.setBackground(UIUtils.VINTAGE_PANEL);
+        
+        apptCardsWrapper.add(card5);
+        apptCardsWrapper.add(card6);
+        apptCardsWrapper.add(card7);
+        apptCardsWrapper.add(card8);
+
+        panelAppointments.add(apptCardsWrapper, BorderLayout.NORTH);
+        panelAppointments.add(jScrollPane4, BorderLayout.CENTER);
+        
+        jScrollPane4.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+        styleTable(tblApptStats);
     }
     
     
@@ -424,6 +500,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         btnReports = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
         lblAdminName = new javax.swing.JLabel();
+        btnAppointments = new javax.swing.JButton();
         headerPanel = new javax.swing.JPanel();
         lblHeaderTitle = new javax.swing.JLabel();
         contentPanel = new javax.swing.JPanel();
@@ -437,11 +514,14 @@ public class AdminDashboard extends javax.swing.JFrame {
         btnAddUser = new javax.swing.JButton();
         btnToggleStatus = new javax.swing.JButton();
         btnDeleteUser = new javax.swing.JButton();
+        btnEditUser = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblUsers = new javax.swing.JTable();
         panelRosters = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         btnAddRoster = new javax.swing.JButton();
+        btnEditRoster = new javax.swing.JButton();
+        btnDeleteRoster = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblRosters = new javax.swing.JTable();
         panelReports = new javax.swing.JPanel();
@@ -449,6 +529,13 @@ public class AdminDashboard extends javax.swing.JFrame {
         btnGenerateReport = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblReports = new javax.swing.JTable();
+        panelAppointments = new javax.swing.JPanel();
+        card5 = new javax.swing.JPanel();
+        card6 = new javax.swing.JPanel();
+        card7 = new javax.swing.JPanel();
+        card8 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tblApptStats = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -469,6 +556,9 @@ public class AdminDashboard extends javax.swing.JFrame {
 
         lblAdminName.setText("jLabel1");
 
+        btnAppointments.setText("Appointments");
+        btnAppointments.addActionListener(this::btnAppointmentsActionPerformed);
+
         javax.swing.GroupLayout sidebarPanelLayout = new javax.swing.GroupLayout(sidebarPanel);
         sidebarPanel.setLayout(sidebarPanelLayout);
         sidebarPanelLayout.setHorizontalGroup(
@@ -483,11 +573,12 @@ public class AdminDashboard extends javax.swing.JFrame {
                                 .addComponent(btnReports, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
                                 .addComponent(btnRosters, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnUsers, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(btnDashboard)))
+                            .addComponent(btnDashboard)
+                            .addComponent(btnAppointments)))
                     .addGroup(sidebarPanelLayout.createSequentialGroup()
                         .addGap(38, 38, 38)
                         .addComponent(lblAdminName)))
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         sidebarPanelLayout.setVerticalGroup(
             sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -501,8 +592,10 @@ public class AdminDashboard extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(btnRosters)
                 .addGap(18, 18, 18)
-                .addComponent(btnReports)
+                .addComponent(btnAppointments)
                 .addGap(18, 18, 18)
+                .addComponent(btnReports)
+                .addGap(14, 14, 14)
                 .addComponent(btnLogout)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -534,11 +627,11 @@ public class AdminDashboard extends javax.swing.JFrame {
         card1.setLayout(card1Layout);
         card1Layout.setHorizontalGroup(
             card1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 138, Short.MAX_VALUE)
+            .addGap(0, 486, Short.MAX_VALUE)
         );
         card1Layout.setVerticalGroup(
             card1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 410, Short.MAX_VALUE)
+            .addGap(0, 1424, Short.MAX_VALUE)
         );
 
         panelDashboard.add(card1);
@@ -547,11 +640,11 @@ public class AdminDashboard extends javax.swing.JFrame {
         card2.setLayout(card2Layout);
         card2Layout.setHorizontalGroup(
             card2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 138, Short.MAX_VALUE)
+            .addGap(0, 486, Short.MAX_VALUE)
         );
         card2Layout.setVerticalGroup(
             card2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 410, Short.MAX_VALUE)
+            .addGap(0, 1424, Short.MAX_VALUE)
         );
 
         panelDashboard.add(card2);
@@ -560,11 +653,11 @@ public class AdminDashboard extends javax.swing.JFrame {
         card3.setLayout(card3Layout);
         card3Layout.setHorizontalGroup(
             card3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 138, Short.MAX_VALUE)
+            .addGap(0, 486, Short.MAX_VALUE)
         );
         card3Layout.setVerticalGroup(
             card3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 410, Short.MAX_VALUE)
+            .addGap(0, 1424, Short.MAX_VALUE)
         );
 
         panelDashboard.add(card3);
@@ -573,11 +666,11 @@ public class AdminDashboard extends javax.swing.JFrame {
         card4.setLayout(card4Layout);
         card4Layout.setHorizontalGroup(
             card4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 138, Short.MAX_VALUE)
+            .addGap(0, 486, Short.MAX_VALUE)
         );
         card4Layout.setVerticalGroup(
             card4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 410, Short.MAX_VALUE)
+            .addGap(0, 1424, Short.MAX_VALUE)
         );
 
         panelDashboard.add(card4);
@@ -593,18 +686,23 @@ public class AdminDashboard extends javax.swing.JFrame {
         btnDeleteUser.setText("Delete User");
         btnDeleteUser.addActionListener(this::btnDeleteUserActionPerformed);
 
+        btnEditUser.setText("Edit User");
+        btnEditUser.addActionListener(this::btnEditUserActionPerformed);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnAddUser)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                .addComponent(btnEditUser)
+                .addGap(18, 18, 18)
                 .addComponent(btnDeleteUser)
-                .addGap(33, 33, 33)
+                .addGap(26, 26, 26)
                 .addComponent(btnToggleStatus)
-                .addContainerGap())
+                .addGap(21, 21, 21))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -613,7 +711,8 @@ public class AdminDashboard extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddUser)
                     .addComponent(btnToggleStatus)
-                    .addComponent(btnDeleteUser))
+                    .addComponent(btnDeleteUser)
+                    .addComponent(btnEditUser))
                 .addContainerGap(65, Short.MAX_VALUE))
         );
 
@@ -637,20 +736,21 @@ public class AdminDashboard extends javax.swing.JFrame {
         panelUsersLayout.setHorizontalGroup(
             panelUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelUsersLayout.createSequentialGroup()
-                .addGap(93, 93, 93)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(145, Short.MAX_VALUE))
-            .addGroup(panelUsersLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(panelUsersLayout.createSequentialGroup()
+                .addGap(93, 93, 93)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(1441, Short.MAX_VALUE))
         );
         panelUsersLayout.setVerticalGroup(
             panelUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelUsersLayout.createSequentialGroup()
+                .addGap(35, 35, 35)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1266, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -659,20 +759,33 @@ public class AdminDashboard extends javax.swing.JFrame {
         btnAddRoster.setText("Add Roster");
         btnAddRoster.addActionListener(this::btnAddRosterActionPerformed);
 
+        btnEditRoster.setText("Edit Roster");
+        btnEditRoster.addActionListener(this::btnEditRosterActionPerformed);
+
+        btnDeleteRoster.setText("Delete Roster");
+        btnDeleteRoster.addActionListener(this::btnDeleteRosterActionPerformed);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(183, Short.MAX_VALUE)
+                .addGap(86, 86, 86)
                 .addComponent(btnAddRoster)
-                .addGap(169, 169, 169))
+                .addGap(48, 48, 48)
+                .addComponent(btnEditRoster)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+                .addComponent(btnDeleteRoster)
+                .addGap(29, 29, 29))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap(22, Short.MAX_VALUE)
-                .addComponent(btnAddRoster)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAddRoster)
+                    .addComponent(btnEditRoster)
+                    .addComponent(btnDeleteRoster))
                 .addGap(20, 20, 20))
         );
 
@@ -697,7 +810,7 @@ public class AdminDashboard extends javax.swing.JFrame {
             panelRostersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelRostersLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1977, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(panelRostersLayout.createSequentialGroup()
                 .addGap(47, 47, 47)
@@ -710,7 +823,7 @@ public class AdminDashboard extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1329, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -757,23 +870,106 @@ public class AdminDashboard extends javax.swing.JFrame {
             panelReportsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelReportsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1977, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(panelReportsLayout.createSequentialGroup()
                 .addGap(47, 47, 47)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(84, Short.MAX_VALUE))
+                .addContainerGap(1474, Short.MAX_VALUE))
         );
         panelReportsLayout.setVerticalGroup(
             panelReportsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelReportsLayout.createSequentialGroup()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1347, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         contentPanel.add(panelReports, "cardReports");
+
+        javax.swing.GroupLayout card5Layout = new javax.swing.GroupLayout(card5);
+        card5.setLayout(card5Layout);
+        card5Layout.setHorizontalGroup(
+            card5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 689, Short.MAX_VALUE)
+        );
+        card5Layout.setVerticalGroup(
+            card5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 463, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout card6Layout = new javax.swing.GroupLayout(card6);
+        card6.setLayout(card6Layout);
+        card6Layout.setHorizontalGroup(
+            card6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1830, Short.MAX_VALUE)
+        );
+        card6Layout.setVerticalGroup(
+            card6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 463, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout card7Layout = new javax.swing.GroupLayout(card7);
+        card7.setLayout(card7Layout);
+        card7Layout.setHorizontalGroup(
+            card7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1830, Short.MAX_VALUE)
+        );
+        card7Layout.setVerticalGroup(
+            card7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 463, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout card8Layout = new javax.swing.GroupLayout(card8);
+        card8.setLayout(card8Layout);
+        card8Layout.setHorizontalGroup(
+            card8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 689, Short.MAX_VALUE)
+        );
+        card8Layout.setVerticalGroup(
+            card8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 463, Short.MAX_VALUE)
+        );
+
+        tblApptStats.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(tblApptStats);
+
+        javax.swing.GroupLayout panelAppointmentsLayout = new javax.swing.GroupLayout(panelAppointments);
+        panelAppointments.setLayout(panelAppointmentsLayout);
+        panelAppointmentsLayout.setHorizontalGroup(
+            panelAppointmentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(card6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(panelAppointmentsLayout.createSequentialGroup()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(card5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(card8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(card7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        panelAppointmentsLayout.setVerticalGroup(
+            panelAppointmentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelAppointmentsLayout.createSequentialGroup()
+                .addComponent(card6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelAppointmentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(card5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(card8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(card7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        contentPanel.add(panelAppointments, "cardAppointments");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -1040,6 +1236,168 @@ public class AdminDashboard extends javax.swing.JFrame {
         }
     }
     }//GEN-LAST:event_btnDeleteUserActionPerformed
+
+    private void btnAppointmentsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAppointmentsActionPerformed
+        CardLayout cl = (CardLayout)(contentPanel.getLayout());
+        cl.show(contentPanel, "cardAppointments");
+        lblHeaderTitle.setText("APPOINTMENT STATISTICS");
+        setActiveButton(btnAppointments); // You will need to add btnAppointments to your setActiveButton method
+        
+        loadAppointmentStats();
+    }//GEN-LAST:event_btnAppointmentsActionPerformed
+
+    private void btnEditRosterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditRosterActionPerformed
+        int selectedRow = tblRosters.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a roster to edit.", "NO SELECTION", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String rosterId = tblRosters.getValueAt(selectedRow, 0).toString();
+        
+        JTextField txtCounselorId = new JTextField(tblRosters.getValueAt(selectedRow, 1).toString());
+        JTextField txtDate = new JTextField(tblRosters.getValueAt(selectedRow, 2).toString());
+        JTextField txtStart = new JTextField(tblRosters.getValueAt(selectedRow, 3).toString());
+        JTextField txtEnd = new JTextField(tblRosters.getValueAt(selectedRow, 4).toString());
+        JTextField txtRoom = new JTextField(tblRosters.getValueAt(selectedRow, 5).toString());
+        String[] statuses = {Roster.STATUS_AVAILABLE, Roster.STATUS_UNAVAILABLE, Roster.STATUS_FULL, Roster.STATUS_LEAVE};
+        JComboBox<String> cmbStatus = new JComboBox<>(statuses);
+        cmbStatus.setSelectedItem(tblRosters.getValueAt(selectedRow, 6).toString());
+
+        styleInputField(txtCounselorId); styleInputField(txtDate); styleInputField(txtStart); styleInputField(txtEnd); styleInputField(txtRoom);
+        
+        JLabel lblCoun = new JLabel("Counselor ID:"); lblCoun.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblDate = new JLabel("Date:"); lblDate.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblStart = new JLabel("Start:"); lblStart.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblEnd = new JLabel("End:"); lblEnd.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblRoom = new JLabel("Room:"); lblRoom.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblStat = new JLabel("Status:"); lblStat.setForeground(UIUtils.VINTAGE_CREAM);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(UIUtils.VINTAGE_PANEL);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0; gbc.gridy = 0; panel.add(lblCoun, gbc);
+        gbc.gridx = 1; panel.add(txtCounselorId, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; panel.add(lblDate, gbc);
+        gbc.gridx = 1; panel.add(txtDate, gbc);
+        gbc.gridx = 0; gbc.gridy = 2; panel.add(lblStart, gbc);
+        gbc.gridx = 1; panel.add(txtStart, gbc);
+        gbc.gridx = 0; gbc.gridy = 3; panel.add(lblEnd, gbc);
+        gbc.gridx = 1; panel.add(txtEnd, gbc);
+        gbc.gridx = 0; gbc.gridy = 4; panel.add(lblRoom, gbc);
+        gbc.gridx = 1; panel.add(txtRoom, gbc);
+        gbc.gridx = 0; gbc.gridy = 5; panel.add(lblStat, gbc);
+        gbc.gridx = 1; panel.add(cmbStatus, gbc);
+
+        int result = JOptionPane.showConfirmDialog(this, panel, "EDIT ROSTER", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                rosterService.updateRoster(
+                    rosterId,
+                    txtCounselorId.getText().trim(),
+                    txtDate.getText().trim(),
+                    txtStart.getText().trim(),
+                    txtEnd.getText().trim(),
+                    txtRoom.getText().trim(),
+                    cmbStatus.getSelectedItem().toString()
+                );
+                JOptionPane.showMessageDialog(this, "Roster updated successfully!", "SUCCESS", JOptionPane.INFORMATION_MESSAGE);
+                loadRostersTable();
+            } catch (InvalidInputException | DataNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "VALIDATION ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnEditRosterActionPerformed
+
+    private void btnDeleteRosterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteRosterActionPerformed
+        int selectedRow = tblRosters.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a roster to delete.", "NO SELECTION", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String rosterId = tblRosters.getValueAt(selectedRow, 0).toString();
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete Roster ID: " + rosterId + "?", "CONFIRM DELETION", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                rosterService.deleteRoster(rosterId);
+                JOptionPane.showMessageDialog(this, "Roster deleted successfully.", "SUCCESS", JOptionPane.INFORMATION_MESSAGE);
+                loadRostersTable();
+            } catch (DataNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnDeleteRosterActionPerformed
+
+    private void btnEditUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditUserActionPerformed
+         int selectedRow = tblUsers.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a user to edit.", "NO SELECTION", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String userId = tblUsers.getValueAt(selectedRow, 0).toString();
+        User existingUser = userService.findById(userId);
+        if (existingUser == null) return;
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(UIUtils.VINTAGE_PANEL);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JTextField txtUsername = new JTextField(existingUser.getUsername());
+        txtUsername.setEditable(false); // Username shouldn't change
+        JPasswordField txtPassword = new JPasswordField(existingUser.getPassword());
+        JTextField txtFullName = new JTextField(existingUser.getFullName());
+        String[] roles = {"Admin", "Counselor", "Receptionist", "Student"};
+        JComboBox<String> cmbRole = new JComboBox<>(roles);
+        cmbRole.setSelectedItem(existingUser.getRole());
+
+        styleInputField(txtUsername); styleInputField(txtPassword); styleInputField(txtFullName);
+        
+        JLabel lblUser = new JLabel("Username:"); lblUser.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblPass = new JLabel("Password:"); lblPass.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblName = new JLabel("Full Name:"); lblName.setForeground(UIUtils.VINTAGE_CREAM);
+        JLabel lblRole = new JLabel("Role:"); lblRole.setForeground(UIUtils.VINTAGE_CREAM);
+
+        gbc.gridx = 0; gbc.gridy = 0; panel.add(lblUser, gbc);
+        gbc.gridx = 1; panel.add(txtUsername, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; panel.add(lblPass, gbc);
+        gbc.gridx = 1; panel.add(txtPassword, gbc);
+        gbc.gridx = 0; gbc.gridy = 2; panel.add(lblName, gbc);
+        gbc.gridx = 1; panel.add(txtFullName, gbc);
+        gbc.gridx = 0; gbc.gridy = 3; panel.add(lblRole, gbc);
+        gbc.gridx = 1; panel.add(cmbRole, gbc);
+
+        int result = JOptionPane.showConfirmDialog(this, panel, "EDIT USER", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                String role = cmbRole.getSelectedItem().toString();
+                String password = new String(txtPassword.getPassword()).trim();
+                String fullName = txtFullName.getText().trim();
+                
+                User updatedUser = null;
+                switch (role) {
+                    case "Admin": updatedUser = new cms.core.Admin(userId, existingUser.getUsername(), password, fullName, existingUser.getStatus()); break;
+                    case "Counselor": updatedUser = new cms.core.Counselor(userId, existingUser.getUsername(), password, fullName, existingUser.getStatus()); break;
+                    case "Receptionist": updatedUser = new cms.core.Receptionist(userId, existingUser.getUsername(), password, fullName, existingUser.getStatus()); break;
+                    case "Student": updatedUser = new cms.core.Student(userId, existingUser.getUsername(), password, fullName, existingUser.getStatus()); break;
+                }
+                
+                userService.updateUser(updatedUser);
+                JOptionPane.showMessageDialog(this, "User updated successfully!", "SUCCESS", JOptionPane.INFORMATION_MESSAGE);
+                loadUsersTable();
+            } catch (DataNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnEditUserActionPerformed
     
     
     /**
@@ -1070,8 +1428,12 @@ public class AdminDashboard extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddRoster;
     private javax.swing.JButton btnAddUser;
+    private javax.swing.JButton btnAppointments;
     private javax.swing.JButton btnDashboard;
+    private javax.swing.JButton btnDeleteRoster;
     private javax.swing.JButton btnDeleteUser;
+    private javax.swing.JButton btnEditRoster;
+    private javax.swing.JButton btnEditUser;
     private javax.swing.JButton btnGenerateReport;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnReports;
@@ -1082,6 +1444,10 @@ public class AdminDashboard extends javax.swing.JFrame {
     private javax.swing.JPanel card2;
     private javax.swing.JPanel card3;
     private javax.swing.JPanel card4;
+    private javax.swing.JPanel card5;
+    private javax.swing.JPanel card6;
+    private javax.swing.JPanel card7;
+    private javax.swing.JPanel card8;
     private javax.swing.JPanel contentPanel;
     private javax.swing.JPanel headerPanel;
     private javax.swing.JPanel jPanel1;
@@ -1090,13 +1456,16 @@ public class AdminDashboard extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JLabel lblAdminName;
     private javax.swing.JLabel lblHeaderTitle;
+    private javax.swing.JPanel panelAppointments;
     private javax.swing.JPanel panelDashboard;
     private javax.swing.JPanel panelReports;
     private javax.swing.JPanel panelRosters;
     private javax.swing.JPanel panelUsers;
     private javax.swing.JPanel sidebarPanel;
+    private javax.swing.JTable tblApptStats;
     private javax.swing.JTable tblReports;
     private javax.swing.JTable tblRosters;
     private javax.swing.JTable tblUsers;

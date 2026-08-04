@@ -15,6 +15,7 @@ import cms.core.ConsultationService;
 import cms.exception.InvalidInputException;
 import cms.exception.DataNotFoundException;
 import cms.util.UIUtils;
+import cms.core.UserService;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -32,6 +33,7 @@ public class CounselorDashboard extends javax.swing.JFrame {
     private AppointmentService apptService;
     private RosterService rosterService;
     private ConsultationService consultService;
+    private UserService userService; 
 
     public CounselorDashboard(User counselor) {
         setUndecorated(true);
@@ -41,6 +43,7 @@ public class CounselorDashboard extends javax.swing.JFrame {
         this.apptService = new AppointmentService();
         this.rosterService = new RosterService();
         this.consultService = new ConsultationService();
+        this.userService = new UserService();
         
         applyDesign();
         loadDashboardStats();
@@ -169,20 +172,23 @@ public class CounselorDashboard extends javax.swing.JFrame {
     }
 
     private void loadAppointmentsTable() {
-        String[] columns = {"Appt ID", "Student ID", "Type", "Date", "Time", "Status", "Reason"};
+        String[] columns = {"Appt ID", "Student Name", "Type", "Date", "Time", "Status", "Reason"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
         };
         for (Appointment appt : apptService.getAppointmentsForCounselor(loggedInCounselor.getUserId())) {
-            model.addRow(new Object[]{ appt.getAppointmentId(), appt.getStudentUserId(), appt.getBookingType(), appt.getAppointmentDate(), appt.getTimeRange(), appt.getStatus(), appt.getReason() });
+            User student = userService.findById(appt.getStudentUserId());
+            String studentName = (student != null) ? student.getFullName() : "Unknown Student";
+            
+            model.addRow(new Object[]{ appt.getAppointmentId(), studentName, appt.getBookingType(), appt.getAppointmentDate(), appt.getTimeRange(), appt.getStatus(), appt.getReason() });
         }
         tblAppointments.setModel(model);
         
         tblAppointments.getColumnModel().getColumn(0).setMinWidth(80);
         tblAppointments.getColumnModel().getColumn(0).setPreferredWidth(80);
-        tblAppointments.getColumnModel().getColumn(1).setMinWidth(110);
-        tblAppointments.getColumnModel().getColumn(1).setPreferredWidth(110);
+        tblAppointments.getColumnModel().getColumn(1).setMinWidth(150); 
+        tblAppointments.getColumnModel().getColumn(1).setPreferredWidth(180);
         tblAppointments.getColumnModel().getColumn(2).setMinWidth(80);
         tblAppointments.getColumnModel().getColumn(2).setPreferredWidth(80);
         tblAppointments.getColumnModel().getColumn(3).setMinWidth(100);
@@ -199,27 +205,39 @@ public class CounselorDashboard extends javax.swing.JFrame {
     }
 
     private void loadRecordsTable() {
-        String[] columns = {"Record ID", "Appt ID", "Case Notes", "Recommendation", "Follow-up Date"};
+        String[] columns = {"Record ID", "Student Name", "Session Date", "Case Notes", "Recommendation", "Follow-up Date"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
         };
         for (ConsultationRecord record : consultService.getRecordsForCounselor(loggedInCounselor.getUserId())) {
-            model.addRow(new Object[]{ record.getRecordId(), record.getAppointmentId(), record.getNotes(), record.getRecommendation(), record.getFollowUpDate() });
+            // look up the appointment to get the date and student ID
+            Appointment appt = apptService.findById(record.getAppointmentId());
+            String studentName = "Unknown";
+            String sessionDate = "N/A";
+            
+            if (appt != null) {
+                User student = userService.findById(appt.getStudentUserId());
+                if (student != null) studentName = student.getFullName();
+                sessionDate = appt.getAppointmentDate();
+            }
+            
+            model.addRow(new Object[]{ record.getRecordId(), studentName, sessionDate, record.getNotes(), record.getRecommendation(), record.getFollowUpDate() });
         }
         tblRecords.setModel(model);
         
-
         tblRecords.getColumnModel().getColumn(0).setMinWidth(80);
         tblRecords.getColumnModel().getColumn(0).setPreferredWidth(80);
-        tblRecords.getColumnModel().getColumn(1).setMinWidth(80);
-        tblRecords.getColumnModel().getColumn(1).setPreferredWidth(80);
-        tblRecords.getColumnModel().getColumn(2).setMinWidth(250);
-        tblRecords.getColumnModel().getColumn(2).setPreferredWidth(300);
+        tblRecords.getColumnModel().getColumn(1).setMinWidth(150);
+        tblRecords.getColumnModel().getColumn(1).setPreferredWidth(180);
+        tblRecords.getColumnModel().getColumn(2).setMinWidth(100);
+        tblRecords.getColumnModel().getColumn(2).setPreferredWidth(100);
         tblRecords.getColumnModel().getColumn(3).setMinWidth(250);
         tblRecords.getColumnModel().getColumn(3).setPreferredWidth(300);
-        tblRecords.getColumnModel().getColumn(4).setMinWidth(120);
-        tblRecords.getColumnModel().getColumn(4).setPreferredWidth(120);
+        tblRecords.getColumnModel().getColumn(4).setMinWidth(250);
+        tblRecords.getColumnModel().getColumn(4).setPreferredWidth(300);
+        tblRecords.getColumnModel().getColumn(5).setMinWidth(120);
+        tblRecords.getColumnModel().getColumn(5).setPreferredWidth(120);
         tblRecords.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         
         styleTableInteraction(tblRecords);

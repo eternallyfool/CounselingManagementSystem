@@ -371,6 +371,7 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         
         UIUtils.styleActionButton(btnAddStudent, UIUtils.VINTAGE_GOLD);
         UIUtils.styleActionButton(btnEditStudent, UIUtils.VINTAGE_GOLD);
+        UIUtils.styleActionButton(btnDeleteStudent, UIUtils.VINTAGE_CREAM);
         UIUtils.styleActionButton(btnToggleStudentStatus, UIUtils.VINTAGE_CREAM);
         
         UIUtils.styleActionButton(btnBookAppt, UIUtils.VINTAGE_GOLD);
@@ -443,6 +444,7 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         btnAddStudent = new javax.swing.JButton();
         btnEditStudent = new javax.swing.JButton();
+        btnDeleteStudent = new javax.swing.JButton();
         btnToggleStudentStatus = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblStudents = new javax.swing.JTable();
@@ -544,7 +546,7 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         card1.setLayout(card1Layout);
         card1Layout.setHorizontalGroup(
             card1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 152, Short.MAX_VALUE)
+            .addGap(0, 235, Short.MAX_VALUE)
         );
         card1Layout.setVerticalGroup(
             card1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -557,7 +559,7 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         card2.setLayout(card2Layout);
         card2Layout.setHorizontalGroup(
             card2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 152, Short.MAX_VALUE)
+            .addGap(0, 235, Short.MAX_VALUE)
         );
         card2Layout.setVerticalGroup(
             card2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -570,7 +572,7 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         card3.setLayout(card3Layout);
         card3Layout.setHorizontalGroup(
             card3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 152, Short.MAX_VALUE)
+            .addGap(0, 235, Short.MAX_VALUE)
         );
         card3Layout.setVerticalGroup(
             card3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -583,7 +585,7 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         card4.setLayout(card4Layout);
         card4Layout.setHorizontalGroup(
             card4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 152, Short.MAX_VALUE)
+            .addGap(0, 235, Short.MAX_VALUE)
         );
         card4Layout.setVerticalGroup(
             card4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -600,6 +602,9 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
         btnEditStudent.setText("Edit Student");
         btnEditStudent.addActionListener(this::btnEditStudentActionPerformed);
 
+        btnDeleteStudent.setText("Delete Student");
+        btnDeleteStudent.addActionListener(this::btnDeleteStudentActionPerformed);
+
         btnToggleStudentStatus.setText("Toggle Student Status");
         btnToggleStudentStatus.addActionListener(this::btnToggleStudentStatusActionPerformed);
 
@@ -613,6 +618,8 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(btnEditStudent)
                 .addGap(18, 18, 18)
+                .addComponent(btnDeleteStudent)
+                .addGap(18, 18, 18)
                 .addComponent(btnToggleStudentStatus)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -623,6 +630,7 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddStudent)
                     .addComponent(btnEditStudent)
+                    .addComponent(btnDeleteStudent)
                     .addComponent(btnToggleStudentStatus))
                 .addContainerGap(19, Short.MAX_VALUE))
         );
@@ -649,11 +657,11 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
             .addGroup(panelStudentsLayout.createSequentialGroup()
                 .addGap(93, 93, 93)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(143, Short.MAX_VALUE))
+                .addContainerGap(348, Short.MAX_VALUE))
             .addGroup(panelStudentsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(290, 290, 290))
         );
         panelStudentsLayout.setVerticalGroup(
             panelStudentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -726,7 +734,7 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
             panelAppointmentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelAppointmentsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 642, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 973, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(panelAppointmentsLayout.createSequentialGroup()
                 .addGap(47, 47, 47)
@@ -786,12 +794,12 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
             panelQueueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelQueueLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 642, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 973, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(panelQueueLayout.createSequentialGroup()
                 .addGap(47, 47, 47)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(140, Short.MAX_VALUE))
+                .addContainerGap(471, Short.MAX_VALUE))
         );
         panelQueueLayout.setVerticalGroup(
             panelQueueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1201,6 +1209,35 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnGenerateQueueActionPerformed
+
+    private void btnDeleteStudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteStudentActionPerformed
+         int selectedRow = tblStudents.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a student to delete.", "NO SELECTION", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String userId = tblStudents.getValueAt(selectedRow, 0).toString();
+        String studentName = tblStudents.getValueAt(selectedRow, 2).toString();
+
+        int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to permanently delete " + studentName + " (" + userId + ")?\nThis action cannot be undone.",
+            "Confirm Deletion",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                userService.deleteUser(userId);
+                JOptionPane.showMessageDialog(this, "Student deleted successfully.", "SUCCESS", JOptionPane.INFORMATION_MESSAGE);
+                loadStudentsTable(); // refresh table
+                loadDashboardStats();
+            } catch (DataNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnDeleteStudentActionPerformed
     
     
     /**
@@ -1235,6 +1272,7 @@ public class ReceptionistDashboard extends javax.swing.JFrame {
     private javax.swing.JButton btnBookAppt;
     private javax.swing.JButton btnCancelAppt;
     private javax.swing.JButton btnDashboard;
+    private javax.swing.JButton btnDeleteStudent;
     private javax.swing.JButton btnEditStudent;
     private javax.swing.JButton btnGenerateQueue;
     private javax.swing.JButton btnLogout;
